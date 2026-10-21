@@ -4,7 +4,7 @@ familia: oms-sodio
 titulo: Sodium reduction
 url: https://www.who.int/news-room/fact-sheets/detail/sodium-reduction
 data_publicacao: 2026-05-11
-licenca: CC BY-NC-SA 3.0 IGO — © World Health Organization
+licenca: © World Health Organization — uso não comercial com atribuição (licença das fichas do site não conferida item a item)
 ---
 
 Key facts

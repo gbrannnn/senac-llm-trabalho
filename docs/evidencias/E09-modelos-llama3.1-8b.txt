@@ -1,0 +1,23 @@
+# E09 — modelos: a mesma bateria do E07 (triagem e extração) no llama3.1:8b
+# commit: d16e6b7+alteracoes · data: 2026-10-20T23:15:59
+# modelo: {"modelo": "llama3.1:8b", "digest": "46e0c10c039e", "embedding": "bge-m3", "digest_embedding": "790764642607"}
+$ LLM_MODELO=llama3.1:8b python -m scripts.experimentos etapas
+
+TRIAGEM 1.1.0@0becc542dd: 19/20 (critério: >= 18)
+  erro: 'comprei uma air fryer': esperado perfil/futura=False, veio estoque/futura=False
+
+EXTRAÇÃO 1.0.0@618be9f5b4: 5/6 (critério: >= 5)
+  erro: 'comprei 500 g de carne moída e um pacote de macarrão': esperado {'carne moida': 500, 'macarrao': 1}, veio {'carne moida': 500.0, 'macarrao': None}
+
+## De ponta a ponta (o sistema inteiro, mesmos 4 pedidos, banco recriado antes de cada modelo)
+$ python comparar.py nutri-qwen ; python comparar.py llama3.1:8b
+--- nutri-qwen
+  [recomendar              ] o que eu faço pra jantar?                     -> concluido       suficiente   chamadas=4 tokens=4567 13.24s | 'Sugestão: Stir-Fried Black Rice with Fried Egg and Roasted Broccoli. Usa arroz, ovo, que e'
+  [recomendar              ] tenho abobrinha aqui, me sugere alguma coisa  -> concluido       suficiente   chamadas=4 tokens=4521 4.92s | "Sugestão: Summer Squash and Basil Pasta. A receita de 'Summer Squash and Basil Pasta' comb"
+  [pergunta                ] Qual é o limite de sódio por dia para um adul -> concluido       suficiente   chamadas=5 tokens=5501 7.35s | 'Segundo a OMS (2026), a recomendação para adultos é consumir menos de 2000 mg de sódio por'
+  [pergunta (fora do corpus)] o que a OMS recomenda sobre cafeína na gravid -> recusa_sem_base insuficiente chamadas=5 tokens=5627 9.48s | 'Não encontrei nas minhas fontes (TBCA e fichas da OMS) a informação para responder isso. C'
+--- llama3.1:8b
+  [recomendar              ] o que eu faço pra jantar?                     -> concluido       suficiente   chamadas=6 tokens=7754 14.42s | 'Sugestão: Stir-Fried Black Rice with Fried Egg and Roasted Broccoli. Stir-Fried Black Rice'
+  [recomendar              ] tenho abobrinha aqui, me sugere alguma coisa  -> concluido       suficiente   chamadas=4 tokens=4395 4.26s | 'Sugestão: Summer Squash and Basil Pasta. Summer Squash and Basil Pasta, pois ela usa abobr'
+  [pergunta                ] Qual é o limite de sódio por dia para um adul -> recusa_sem_base insuficiente chamadas=3 tokens=2043 2.54s | 'Não encontrei nas minhas fontes (TBCA e fichas da OMS) a informação para responder isso. C'
+  [pergunta (fora do corpus)] o que a OMS recomenda sobre cafeína na gravid -> recusa_sem_base insuficiente chamadas=3 tokens=2090 3.05s | 'Não encontrei nas minhas fontes (TBCA e fichas da OMS) a informação para responder isso. C'

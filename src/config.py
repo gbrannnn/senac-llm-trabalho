@@ -37,7 +37,7 @@ MAX_RODADAS_AVALIACAO = 3      # vezes que uma proposta pode ser reprovada
 MAX_TOKENS_JANELA = 6000       # prompt de UMA chamada (num_ctx=8192 no Modelfile deixa folga)
 MAX_TOKENS_EXECUCAO = 40000    # soma de todas as chamadas do turno
 TIMEOUT_EXECUCAO_S = 120       # parede: modelo local é mais lento que o declarado na v1
-RECURSION_LIMIT = 40           # declarado mesmo existindo padrão (25) — §6.6
+RECURSION_LIMIT = 40           # declarado: o padrão do LangGraph 1.2.16 é 10007 (era 25 nas 0.x) e muda por env var — docs/grafo.md §6.6
 K_RECEITAS = 5
 K_OMS = 3
 JANELA_CONVERSA_TURNOS = 6     # turnos (usuário+sistema) mantidos no estado da conversa

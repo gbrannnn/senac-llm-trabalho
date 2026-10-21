@@ -6,6 +6,8 @@
     python -m scripts.experimentos remocao     # E05: remoção do titular + varredura
     python -m scripts.experimentos frase       # E06: a regra da frase no prompt do chef
     python -m scripts.experimentos etapas      # E07: triagem e extração contra casos rotulados
+    python -m scripts.experimentos perguntas   # E08: as dez perguntas do rag.md pelo sistema inteiro
+    python -m scripts.experimentos prazo       # E10: a pausa vence sem resposta
     python -m scripts.experimentos todos
 """
 import contextlib
@@ -191,8 +193,54 @@ def etapas():
             print("  erro:", e)
 
 
+def prazo():
+    """§8.4: a pausa vence e nada é gravado. Prazo de 3 s só neste experimento."""
+    from src import main
+    with evidencia("E10", "prazo: ninguém respondeu à pausa", "python -m scripts.experimentos prazo"):
+        config.PRAZO_APROVACAO_S = 3
+        antes = {i["item_id"]: i["quantidade"] for i in db.estoque("ana")}.get("batata")
+        s = main.executar("ana", "prazo", "chegaram 2 kg de batata", nome_log="E10_prazo_1_pausa")["saida"]
+        print("1. pausa      :", s["termino"], "| expira_em:", s["pendencia"]["expira_em"])
+        time.sleep(4)
+        print("2. 4 s depois : --pendentes --expirar ->", json.dumps(main.pendentes(expirar=True), ensure_ascii=False))
+        depois = {i["item_id"]: i["quantidade"] for i in db.estoque("ana")}.get("batata")
+        print(f"3. batata no estoque: antes={antes} depois={depois} -> {'nada gravado' if antes == depois else 'GRAVOU'}")
+        s = main.executar("ana", "prazo", retomada={"acao": "aprovar"}, nome_log="E10_prazo_2_aprovar_tarde")["saida"]
+        print("4. aprovar depois de expirada:", s["resultado"])
+        config.PRAZO_APROVACAO_S = 24 * 3600
+
+
+PERGUNTAS = [  # (n, pergunta, forma, o que a responde no corpus)
+    (1, "Quanta proteína tem 100 g de ovo?", "registro (TBCA)", "BRC0012J"),
+    (2, "Quantas calorias tem 100 g de banana?", "registro (TBCA)", "BRC0011C"),
+    (3, "Qual é o limite de sódio por dia para um adulto?", "assunto (OMS)", "oms-sodio-2026#03"),
+    (4, "Para crianças, o limite de sal da OMS é o mesmo dos adultos?", "assunto, EXCEÇÃO (crianças 2–15)", "oms-sodio-2026#03"),
+    (5, "Até quando é a meta global de reduzir o consumo de sal em 30%?", "assunto, EXCEÇÃO (prazo estendido; há versão revogada)", "oms-sodio-2026#08"),
+    (6, "Quantos gramas de sal equivalem a 2000 mg de sódio?", "termo (conversor)", "oms-sodio-2026#06"),
+    (7, "Qual o limite de açúcar livre que a OMS recomenda?", "assunto (OMS)", "oms-alimentacao-saudavel-2026#04"),
+    (8, "Quanto de gordura trans a OMS recomenda no máximo?", "assunto (OMS)", "oms-alimentacao-saudavel-2026#06"),
+    (9, "me sugere alguma coisa com abobrinha", "assunto (receitas) + registro (estoque)", "R01931"),
+    (10, "Qual a recomendação da OMS sobre cafeína na gravidez?", "FORA DO CORPUS", None),
+    (11, "Quanta proteína tem 100 g de quinoa?", "FORA DO CORPUS (registro inexistente)", None),
+]
+
+
+def perguntas():
+    from src.main import executar
+    with evidencia("E08", "perguntas: as dez perguntas do rag.md pelo sistema inteiro", "python -m scripts.experimentos perguntas"):
+        for n, pergunta, forma, alvo in PERGUNTAS:
+            r = executar("ana", f"pergunta-{n}", pergunta, nome_log=f"E08_pergunta_{n:02d}")
+            linhas = [json.loads(l) for l in open(r["log"], encoding="utf-8")]
+            recuperados = [i for d in linhas if d.get("tipo") == "no" and isinstance(d["atualizacao"], dict)
+                           for x in d["atualizacao"].get("recuperacoes") or [] for i in x["ids"]]
+            s = r["saida"]
+            achou = "—" if alvo is None else ("SIM" if alvo in recuperados or alvo == (s.get("receita") or {}).get("id") else "não")
+            print(f"{n:2d}. {pergunta}\n    forma: {forma} | esperado: {alvo} | recuperado: {achou} | "
+                  f"{s['tipo']}/{s['suficiencia']}\n    -> {s['resultado'][:260]}\n")
+
+
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
     alvo = sys.argv[1] if len(sys.argv) > 1 else "todos"
-    for nome in (["janela", "reducer", "revogado", "remocao", "frase", "etapas"] if alvo == "todos" else [alvo]):
+    for nome in (["janela", "reducer", "revogado", "remocao", "frase", "etapas", "perguntas", "prazo"] if alvo == "todos" else [alvo]):
         globals()[nome]()

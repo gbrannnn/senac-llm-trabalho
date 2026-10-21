@@ -1,0 +1,9 @@
+# E10 — prazo: ninguém respondeu à pausa
+# commit: d16e6b7+alteracoes · data: 2026-10-20T23:22:43
+# modelo: {"modelo": "nutri-qwen", "digest": "90eb002e84db", "embedding": "bge-m3", "digest_embedding": "790764642607"}
+$ python -m scripts.experimentos prazo
+
+1. pausa      : aguardando_humano | expira_em: 2026-10-20T23:22:42
+2. 4 s depois : --pendentes --expirar -> [{"thread_id": "ana:prazo", "acao": "estoque.somar", "expira_em": "2026-10-20T23:22:42", "vencida": true, "resultado": "O prazo para aprovar acabou. Nada foi gravado."}]
+3. batata no estoque: antes=3.0 depois=3.0 -> nada gravado
+4. aprovar depois de expirada: Não há nada aguardando aprovação nesta conversa.

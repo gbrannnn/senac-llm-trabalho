@@ -1,0 +1,49 @@
+# E08 — perguntas: as dez perguntas do rag.md pelo sistema inteiro
+# commit: d16e6b7+alteracoes · data: 2026-10-20T23:14:51
+# modelo: {"modelo": "nutri-qwen", "digest": "90eb002e84db", "embedding": "bge-m3", "digest_embedding": "790764642607"}
+$ python -m scripts.experimentos perguntas
+
+ 1. Quanta proteína tem 100 g de ovo?
+    forma: registro (TBCA) | esperado: BRC0012J | recuperado: SIM | resposta/suficiente
+    -> 100 g de ovo contém aproximadamente 9,04 g de proteína, segundo a TBCA (BRC0012J).
+
+ 2. Quantas calorias tem 100 g de banana?
+    forma: registro (TBCA) | esperado: BRC0011C | recuperado: SIM | resposta/suficiente
+    -> De acordo com a TBCA, 100 g de banana contém 107 kcal.
+
+ 3. Qual é o limite de sódio por dia para um adulto?
+    forma: assunto (OMS) | esperado: oms-sodio-2026#03 | recuperado: SIM | resposta/suficiente
+    -> Segundo a OMS (2026), a recomendação para adultos é consumir menos de 2000 mg de sódio por dia, equivalente a menos de 5 gramas de sal, ou aproximadamente uma colher de chá.
+
+ 4. Para crianças, o limite de sal da OMS é o mesmo dos adultos?
+    forma: assunto, EXCEÇÃO (crianças 2–15) | esperado: oms-sodio-2026#03 | recuperado: SIM | resposta/suficiente
+    -> De acordo com a OMS (2026), o limite de sal para adultos é de menos de 2000 mg/dia (equivalente a menos de 5 gramas/dia de sal, ou cerca de uma colher de chá). Para crianças entre 2 e 15 anos, a recomendação é ajustar a dose adulta de acordo com suas necessida
+
+ 5. Até quando é a meta global de reduzir o consumo de sal em 30%?
+    forma: assunto, EXCEÇÃO (prazo estendido; há versão revogada) | esperado: oms-sodio-2026#08 | recuperado: SIM | resposta/suficiente
+    -> A meta global de reduzir o consumo de sal em 30% foi estabelecida pela OMS em 2013, como parte de um conjunto de 9 objetivos voluntários para a prevenção e controle de doenças não transmissíveis (NCDs). Este objetivo visa reduzir o consumo relativo de sal em 3
+
+ 6. Quantos gramas de sal equivalem a 2000 mg de sódio?
+    forma: termo (conversor) | esperado: oms-sodio-2026#06 | recuperado: não | recusa/insuficiente
+    -> Não encontrei nas minhas fontes (TBCA e fichas da OMS) a informação para responder isso. Consigo informar a composição de alimentos como abacate, abobrinha, abóbora, alho, amendoim, amido de milho, arroz, aveia, azeitona, açúcar mascavo, banana, batata, e as r
+
+ 7. Qual o limite de açúcar livre que a OMS recomenda?
+    forma: assunto (OMS) | esperado: oms-alimentacao-saudavel-2026#04 | recuperado: SIM | resposta/suficiente
+    -> De acordo com a OMS (2026), o consumo de açúcar livre deve ser limitado a menos de 10% da ingestão diária de energia total, equivalente a aproximadamente 50 g (ou cerca de 12 colheres de sopa) para uma pessoa com peso corporal saudável que consome cerca de 200
+
+ 8. Quanto de gordura trans a OMS recomenda no máximo?
+    forma: assunto (OMS) | esperado: oms-alimentacao-saudavel-2026#06 | recuperado: SIM | recusa/insuficiente
+    -> Não encontrei nas minhas fontes (TBCA e fichas da OMS) a informação para responder isso. Consigo informar a composição de alimentos como abacate, abobrinha, abóbora, alho, amendoim, amido de milho, arroz, aveia, azeitona, açúcar mascavo, banana, batata, e as r
+
+ 9. me sugere alguma coisa com abobrinha
+    forma: assunto (receitas) + registro (estoque) | esperado: R01931 | recuperado: SIM | recomendacao/suficiente
+    -> Sugestão: Summer Squash and Basil Pasta. A receita de Summer Squash and Basil Pasta usa abobrinha, alho, ervas, limão e macarrão, todos ingredientes que você já tem em casa. A receita inteira tem cerca de 1914 kcal e 46 g de proteína (TBCA). (Essa recomendação
+
+10. Qual a recomendação da OMS sobre cafeína na gravidez?
+    forma: FORA DO CORPUS | esperado: None | recuperado: — | recusa/insuficiente
+    -> Não encontrei nas minhas fontes (TBCA e fichas da OMS) a informação para responder isso. Consigo informar a composição de alimentos como abacate, abobrinha, abóbora, alho, amendoim, amido de milho, arroz, aveia, azeitona, açúcar mascavo, banana, batata, e as r
+
+11. Quanta proteína tem 100 g de quinoa?
+    forma: FORA DO CORPUS (registro inexistente) | esperado: None | recuperado: — | recusa/insuficiente
+    -> Não encontrei 'quinoa' na tabela de composição que eu uso (um recorte da TBCA). Consigo informar a composição de alimentos como abacate, abobrinha, abóbora, alho, amendoim, amido de milho, arroz, aveia, azeitona, açúcar mascavo, banana, batata, e as recomendaç
+

@@ -1,5 +1,5 @@
 # E07 — etapas: triagem e extração contra casos rotulados
-# commit: 4bfead4+alteracoes · data: 2026-10-20T22:52:34
+# commit: d16e6b7 · data: 2026-10-20T23:04:26
 # modelo: {"modelo": "nutri-qwen", "digest": "90eb002e84db", "embedding": "bge-m3", "digest_embedding": "790764642607"}
 $ python -m scripts.experimentos etapas
 

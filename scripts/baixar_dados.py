@@ -7,7 +7,7 @@
 - TBCA: só os alimentos do catálogo, por código -> dados/tbca.json (NÃO versionado:
   a TBCA não permite reprodução; o script baixa de novo em cada máquina);
 - OMS: fichas atuais + uma versão de 2018 (documento revogado, de propósito)
-  -> dados/corpus/oms/*.md (versionado, CC BY-NC-SA 3.0 IGO, com atribuição).
+  -> dados/corpus/oms/*.md (versionado, © OMS, uso não comercial com atribuição).
 """
 import ast
 import csv
@@ -159,7 +159,7 @@ def baixar_oms() -> None:
         pagina = requests.get(doc["url"], timeout=60).content.decode("utf-8", "replace")
         texto = _html_para_md(pagina)
         cabecalho = "\n".join(f"{k}: {v}" for k, v in doc.items())
-        destino.write_text(f"---\n{cabecalho}\nlicenca: CC BY-NC-SA 3.0 IGO — © World Health Organization\n---\n\n{texto}\n",
+        destino.write_text(f"---\n{cabecalho}\nlicenca: © World Health Organization — uso não comercial com atribuição (licença das fichas do site não conferida item a item)\n---\n\n{texto}\n",
                            encoding="utf-8")
         print(f"oms: {destino.name} ({len(texto.split())} palavras)")
 

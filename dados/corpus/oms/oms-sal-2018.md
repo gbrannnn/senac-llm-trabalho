@@ -4,7 +4,7 @@ familia: oms-sodio
 titulo: Salt reduction (versão de 2018)
 url: http://web.archive.org/web/20180430180905id_/http://www.who.int:80/news-room/fact-sheets/detail/salt-reduction
 data_publicacao: 2018-04-30
-licenca: CC BY-NC-SA 3.0 IGO — © World Health Organization
+licenca: © World Health Organization — uso não comercial com atribuição (licença das fichas do site não conferida item a item)
 ---
 
 Increasing production of more and more processed food, rapid urbanization, and changing lifestyles are transforming dietary patterns. Highly processed foods are increasing in availability and becoming more affordable. People around the world are consuming more energy-dense foods that are high in saturated fats, trans fats, sugars, and salt. Salt is the primary source of sodium and increased consumption of sodium is associated with hypertension and increased risk of heart disease and stroke.

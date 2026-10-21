@@ -4,7 +4,7 @@ familia: oms-alimentacao-saudavel
 titulo: Healthy diet
 url: https://www.who.int/news-room/fact-sheets/detail/healthy-diet
 data_publicacao: 2026-01-26
-licenca: CC BY-NC-SA 3.0 IGO — © World Health Organization
+licenca: © World Health Organization — uso não comercial com atribuição (licença das fichas do site não conferida item a item)
 ---
 
 ## Key facts

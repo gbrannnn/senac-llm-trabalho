@@ -1,17 +1,17 @@
 # E06 — frase: a regra de parada do chef, com e sem
-# commit: 4bfead4+alteracoes · data: 2026-10-20T22:52:07
+# commit: d16e6b7 · data: 2026-10-20T23:03:59
 # modelo: {"modelo": "nutri-qwen", "digest": "90eb002e84db", "embedding": "bge-m3", "digest_embedding": "790764642607"}
 $ python -m scripts.experimentos frase
 
 --- chef COM a frase da regra 2
-  o que eu faço pra jantar?              -> concluido       chamadas= 4 tokens=  4669   4.6s
-  quero algo com frango                  -> concluido       chamadas= 4 tokens=  4626   4.5s
-  me sugere um almoço com batata         -> concluido       chamadas= 4 tokens=  4802   5.1s
-  tenho ovo e espinafre, o que faço?     -> concluido       chamadas= 4 tokens=  4742   5.2s
-  uma massa pra hoje                     -> concluido       chamadas= 4 tokens=  4535   4.5s
+  o que eu faço pra jantar?              -> concluido       chamadas= 4 tokens=  4655   4.8s
+  quero algo com frango                  -> concluido       chamadas= 4 tokens=  4712   4.8s
+  me sugere um almoço com batata         -> concluido       chamadas= 4 tokens=  4766   5.3s
+  tenho ovo e espinafre, o que faço?     -> concluido       chamadas= 4 tokens=  4864   5.0s
+  uma massa pra hoje                     -> concluido       chamadas= 4 tokens=  4644   5.0s
 --- chef SEM a frase da regra 2
-  o que eu faço pra jantar?              -> concluido       chamadas= 4 tokens=  4552   4.9s
-  quero algo com frango                  -> concluido       chamadas= 4 tokens=  4561   4.6s
-  me sugere um almoço com batata         -> concluido       chamadas= 4 tokens=  4652   5.2s
-  tenho ovo e espinafre, o que faço?     -> concluido       chamadas= 4 tokens=  4599   5.1s
-  uma massa pra hoje                     -> concluido       chamadas= 4 tokens=  4427   5.0s
+  o que eu faço pra jantar?              -> concluido       chamadas= 4 tokens=  4577   4.9s
+  quero algo com frango                  -> concluido       chamadas= 4 tokens=  4578   4.5s
+  me sugere um almoço com batata         -> concluido       chamadas= 5 tokens=  6620   5.9s
+  tenho ovo e espinafre, o que faço?     -> concluido       chamadas= 4 tokens=  4716   5.1s
+  uma massa pra hoje                     -> concluido       chamadas= 4 tokens=  4464   4.9s

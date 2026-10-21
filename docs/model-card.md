@@ -2,6 +2,23 @@
 
 **Versão do documento:** 1.0.0 · **Data:** 16/10/2026 · **Commit descrito:** `d2eb10a` · **Exercício:** Aula 12 — Governança
 
+> **Nota de 20/10/2026 (Parte 2).** Este card descreve o sistema **antes do código** (commit `d2eb10a`), e o texto abaixo continua valendo como registro daquele estado. A Parte 2 (commit `d16e6b7`) fechou parte das lacunas, com evidência:
+> - **L05:** ferramentas implementadas, só de leitura, com lista por agente ([arquitetura.md §3.2](arquitetura.md#as-ferramentas)).
+> - **L06:** `usuario_id` injetado pelo código ([ferramentas.py](../src/ferramentas.py) `Ctx`).
+> - **L07:** alérgeno barrado por dois controles em código ([test_portao.py](../tests/test_portao.py)).
+> - **L08:** escrita de estoque só soma, após aprovação.
+> - **L11:** orçamento em código ([config.py](../src/config.py), `estouro`).
+> - **L13:** modelo local com digest registrado no log, sem envio a provedor ([modelos.md](modelos.md)).
+> - **L14:** pausas para estoque e para remoção de alergia ([humano.md](humano.md)).
+> - **L15:** escrita só depois de aprovar; prazo vencido não grava.
+> - **L18:** `perfil.atualizar` não é ferramenta do modelo.
+> - **L25:** perfil sem idade, peso, altura e rotina.
+> - **L28 (parcial):** log JSONL com versões, ferramentas e saída ([registro.py](../src/registro.py)).
+> - **L30:** remoção executada e verificada por varredura ([E05](evidencias/E05-remocao.txt)).
+> - **L31 (parcial):** execuções reais em `logs/`.
+>
+> Continuam abertas, entre outras: **L01** (papéis), **L04** (idade e condição clínica), **L12** (gasto, sem sentido com modelo local), **L16** (interrupção), **L23** (consentimento), **L32** (juiz) e o expurgo automático do checkpoint ([memoria.md §5.4](memoria.md#54-como-o-agente-perde-a-memória)). A revisão completa do card fica para a Parte 3.
+
 > **Como ler este documento.** Cada campo tem duas colunas: a **afirmação** e a
 > **evidência** que a sustenta. A evidência é um caminho no repositório (arquivo
 > e linha, saída de comando). Quando não há evidência, a afirmação traz a marca
