@@ -68,7 +68,7 @@ Se ainda assim uma chamada passar de 6.000 tokens, a execução termina em `teto
 |---|---|---|
 | semântica (perfil) | **modelo extrai, código valida, humano aprova o perigoso.** `extrair_perfil` devolve (campo, operação, valor) num schema; o código aceita só campos de uma lista fechada; remover alergia pausa para a pessoa | 0 ou 1 linha alterada + 1 registro no livro de escritas |
 | episódica (histórico) | **código, por regra:** só a recomendação que passou no portão e no avaliador | 1 linha de ~85 bytes de texto + **4.096 bytes de vetor** (1024 × float32) |
-| procedural | **humano corrige.** O agente não escreve aqui. As duas regras atuais foram redigidas a partir da inspeção do acervo, e a **aprovação humana está pendente** (marcado no arquivo) | 0 por execução |
+| procedural | **humano corrige.** O agente não escreve aqui. As duas regras atuais foram redigidas a partir da inspeção do acervo e **aprovadas por Pedro Henrique Gomes em 20/10/2026**; o aprovador e a data ficam registrados ao lado de cada regra, no arquivo versionado (fecha a lacuna L09 do model card) | 0 por execução |
 | estoque (não é memória do agente, mas é escrita) | **humano aprova**, depois de o modelo extrair e o código casar com o catálogo | N linhas + 1 registro no livro |
 
 **A escrita de memória é escrita.** Todas passam por `escrever_uma_vez` ([db.py](../src/db.py)), com a chave derivada do **conteúdo**:

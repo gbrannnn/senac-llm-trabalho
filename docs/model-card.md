@@ -7,6 +7,7 @@
 > - **L06:** `usuario_id` injetado pelo código ([ferramentas.py](../src/ferramentas.py) `Ctx`).
 > - **L07:** alérgeno barrado por dois controles em código ([test_portao.py](../tests/test_portao.py)).
 > - **L08:** escrita de estoque só soma, após aprovação.
+> - **L09:** cada regra procedural registra aprovador e data no arquivo versionado ([regras_procedurais.md](../src/prompts/regras_procedurais.md)).
 > - **L11:** orçamento em código ([config.py](../src/config.py), `estouro`).
 > - **L13:** modelo local com digest registrado no log, sem envio a provedor ([modelos.md](modelos.md)).
 > - **L14:** pausas para estoque e para remoção de alergia ([humano.md](humano.md)).
