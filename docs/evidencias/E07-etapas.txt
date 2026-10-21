@@ -1,0 +1,9 @@
+# E07 — etapas: triagem e extração contra casos rotulados
+# commit: 4bfead4+alteracoes · data: 2026-10-20T22:52:34
+# modelo: {"modelo": "nutri-qwen", "digest": "90eb002e84db", "embedding": "bge-m3", "digest_embedding": "790764642607"}
+$ python -m scripts.experimentos etapas
+
+TRIAGEM 1.1.0@0becc542dd: 20/20 (critério: >= 18)
+
+EXTRAÇÃO 1.0.0@618be9f5b4: 5/6 (critério: >= 5)
+  erro: 'comprei 500 g de carne moída e um pacote de macarrão': esperado {'carne moida': 500, 'macarrao': 1}, veio {'carne moida': 500.0, 'macarrao': None}

@@ -1,0 +1,13 @@
+# Python 3.13. Tudo fixado: parte do comportamento mora na biblioteca (docs/grafo.md §6.6).
+openai==3.35.1
+langgraph==1.2.16
+langgraph-checkpoint==4.3.0
+langgraph-checkpoint-sqlite==3.1.2
+langchain-core==1.6.12
+pydantic==2.14.1
+numpy==2.5.4
+python-dotenv==1.2.4
+requests==2.34.2
+pytest==9.1.1
+# Modelos (fora do pip, no Ollama 0.40.6): qwen2.5:7b-instruct digest 845dbda0ea48 + Modelfile -> nutri-qwen;
+# bge-m3 digest 790764642607 (embedding, 1024 dimensões).

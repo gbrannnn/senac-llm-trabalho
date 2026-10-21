@@ -1,0 +1,8 @@
+# Modelo de chat do agente: qwen2.5 7B instruct (Q4_K_M), digest 845dbda0ea48.
+# Por que existe: o Ollama 0.40.6 serve este modelo com janela de 4096 tokens por
+# padrão e TRUNCA O INÍCIO do prompt em silêncio (medido: docs/evidencias/E02).
+# O orçamento declarado é de 6000 tokens por pedido, então fixamos 8192 aqui.
+FROM qwen2.5:7b-instruct
+PARAMETER num_ctx 8192
+PARAMETER temperature 0
+PARAMETER top_p 1

@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+# dados brutos e derivados: regenerados por `python -m scripts.preparar`
+dados/bruto/
+dados/tbca.json
+dados/indice/
+dados/nutri.sqlite*
+dados/checkpoints.sqlite*

@@ -1,0 +1,9 @@
+# E02 — janela: truncamento silencioso do contexto
+# commit: 4bfead4+alteracoes · data: 2026-10-20T22:50:42
+# modelo: {"modelo": "nutri-qwen", "digest": "90eb002e84db", "embedding": "bge-m3", "digest_embedding": "790764642607"}
+$ python -m scripts.experimentos janela
+
+modelo=qwen2.5:7b-instruct    prompt_tokens_processados= 2050 erro_ou_aviso=nenhum resposta='O código para calcular a área de um círculo é dado o'
+modelo=nutri-qwen             prompt_tokens_processados= 4559 erro_ou_aviso=nenhum resposta='O código que você forneceu não é válido. Você pode verificar se'
+
+Leitura: o mesmo prompt foi processado inteiro (4559 tokens) só com num_ctx=8192. Com a janela padrão, 2509 tokens do INÍCIO foram descartados sem erro e sem aviso — e o início é onde fica o system prompt. Quando estoura, o Ollama corta para cerca de metade da janela (2050 de 4096).

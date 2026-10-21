@@ -1,0 +1,15 @@
+# E03 — reducer: o mesmo grafo com e sem reducer em fontes
+# commit: 4bfead4+alteracoes · data: 2026-10-20T22:50:46
+# modelo: {"modelo": "nutri-qwen", "digest": "90eb002e84db", "embedding": "bge-m3", "digest_embedding": "790764642607"}
+$ python -m scripts.experimentos reducer
+
+--- reducer em `fontes`: SIM (por_turno)
+  carregar_perfil      escreveu fontes=['perfil']
+  carregar_estoque     escreveu fontes=['estoque']
+  carregar_historico   escreveu fontes=['historico', 'historico']
+  estado depois da junção: fontes=['estoque', 'historico', 'historico', 'perfil']
+--- reducer em `fontes`: NÃO (último valor)
+  carregar_perfil      escreveu fontes=['perfil']
+  carregar_historico   escreveu fontes=['historico', 'historico']
+  carregar_estoque     escreveu fontes=['estoque']
+  EXCEÇÃO InvalidUpdateError: At key 'fontes': Can receive only one value per step. Use an Annotated key to handle multiple values.

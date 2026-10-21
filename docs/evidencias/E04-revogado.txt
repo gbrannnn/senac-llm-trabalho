@@ -1,0 +1,17 @@
+# E04 — revogado: a ficha de 2018 no corpus, com e sem desempate
+# commit: 4bfead4+alteracoes · data: 2026-10-20T22:51:11
+# modelo: {"modelo": "nutri-qwen", "digest": "90eb002e84db", "embedding": "bge-m3", "digest_embedding": "790764642607"}
+$ python -m scripts.experimentos revogado
+
+--- desempate por data_publicacao: DESLIGADO
+  recuperados: [('oms-sodio-2026#08', '2026-05-11', 0.693), ('oms-sal-2018#10', '2018-04-30', 0.655), ('oms-sodio-2026#00', '2026-05-11', 0.614)]
+  descartados: []
+  saída (suficiente): A meta global de reduzir o consumo de sal em 30% foi estabelecida pela Assembleia Mundial da Saúde em 2013, como parte dos objetivos voluntários globais para a prevenção e controle de doenças não transmissíveis (NCDs). Este objetivo visa reduzir o consumo relativo de sal em 30% até 2025. No entanto, o prazo foi estendido para 2030 em uma decisão da Assembleia Mundial da Saúde em 2019, para alinhá-lo com o Plano de Ação Global para a Prevenção e Controle de Doenças Não Transmissíveis 2013-2020.
+  fontes: ['oms-sodio-2026#08', 'oms-sal-2018#10', 'oms-sodio-2026#00']
+
+--- desempate por data_publicacao: LIGADO
+  recuperados: [('oms-sodio-2026#08', '2026-05-11', 0.693), ('oms-sodio-2026#00', '2026-05-11', 0.614), ('oms-sodio-2026#07', '2026-05-11', 0.599)]
+  descartados: ['oms-sal-2018#10', 'oms-sal-2018#09']
+  saída (suficiente): A meta global de reduzir o consumo de sal em 30% foi estabelecida pela OMS em 2013, como parte de um conjunto de 9 objetivos voluntários para a prevenção e controle de doenças não transmissíveis (NCDs). Este objetivo visa reduzir o consumo relativo de sal em 30% até 2025. No entanto, o prazo para atingir esses objetivos foi estendido para 2030 em uma decisão da Assembleia Mundial da Saúde em 2019, para alinhá-lo com o Plano de Ação Global para a Prevenção e Controle de Doenças Não Transmissíveis 2013-2020.
+  fontes: ['oms-sodio-2026#08', 'oms-sodio-2026#00', 'oms-sodio-2026#07']
+

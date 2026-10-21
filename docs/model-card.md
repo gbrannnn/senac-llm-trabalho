@@ -24,12 +24,12 @@
 
 | Sigla | Arquivo |
 |---|---|
-| A | [doc/arquitetura-v1.md](arquitetura-v1.md) |
-| B | [doc/base-de-conhecimento-v1.md](base-de-conhecimento-v1.md) |
-| M | [doc/memoria.md](memoria.md) |
-| V | [doc/aula-11-avaliacao.md](aula-11-avaliacao.md) |
-| G | [doc/grupo.md](grupo.md) |
-| E01 | [doc/evidencias/E01-inventario-repositorio.txt](evidencias/E01-inventario-repositorio.txt) — saídas de comando sobre o repositório |
+| A | [docs/arquitetura-v1.md](arquitetura-v1.md) |
+| B | [docs/base-de-conhecimento-v1.md](base-de-conhecimento-v1.md) |
+| M | [docs/memoria-v1.md](memoria-v1.md) |
+| V | [docs/aula-11-avaliacao.md](aula-11-avaliacao.md) |
+| G | [docs/grupo.md](grupo.md) |
+| E01 | [docs/evidencias/E01-inventario-repositorio.txt](evidencias/E01-inventario-repositorio.txt) — saídas de comando sobre o repositório |
 
 Uma referência como `A:13` significa *arquivo A, linha 13*.
 
@@ -68,13 +68,13 @@ A coluna **Onde deveria ser aplicado** é a decisão de projeto. A coluna
 | **Ação proibida — prescrever, diagnosticar, tratar** | Recusa. | **prompt** ([A:13](arquitetura-v1.md?plain=1#L13)) + **roteador LLM** ([A:51](arquitetura-v1.md?plain=1#L51)) | **Só prompt.** O modelo pode desobedecer → **LACUNA (L03)** |
 | **Ação proibida — recomendar receita com alérgeno ou restrição do perfil** | Nenhuma receita aprovada pode conter ingrediente que conste em `perfil.alergias`/`restricoes`. Declarado como propriedade determinística em [V:44](aula-11-avaliacao.md?plain=1#L44) e caso crítico C05 [V:18](aula-11-avaliacao.md?plain=1#L18). | **código**: filtro determinístico antes de `recomendacao.registrar` e do RETORNO; o avaliador LLM ([A:63-65](arquitetura-v1.md?plain=1#L63-L65)) **não** é o controle | **Não.** No desenho, quem verifica é o avaliador LLM → **LACUNA (L07)**, a mais grave |
 | **Ação proibida — descontar estoque por consumo** | Fora da v1. | **ausência de ferramenta**: não há ferramenta de "consumir" ([A:17-26](arquitetura-v1.md?plain=1#L17-L26), [A:119](arquitetura-v1.md?plain=1#L119)) | **Parcial.** A ausência está na lista declarada, mas `estoque.atualizar(usuario_id, itens)` aceita qualquer quantidade e poderia ser usada para zerar itens → **LACUNA (L08)** |
-| **Ação proibida — alterar a memória procedural (regras no prompt)** | Só um humano promove uma regra. | **ausência de ferramenta**: nenhuma das oito ferramentas escreve no prompt ([A:17-26](arquitetura-v1.md?plain=1#L17-L26)); processo de curadoria em [M:108](memoria.md?plain=1#L108) | **Declarado.** A ausência pode ser conferida na lista de ferramentas. O processo de curadoria não tem registro (quem aprovou qual regra) → **LACUNA (L09)** |
+| **Ação proibida — alterar a memória procedural (regras no prompt)** | Só um humano promove uma regra. | **ausência de ferramenta**: nenhuma das oito ferramentas escreve no prompt ([A:17-26](arquitetura-v1.md?plain=1#L17-L26)); processo de curadoria em [M:108](memoria-v1.md?plain=1#L108) | **Declarado.** A ausência pode ser conferida na lista de ferramentas. O processo de curadoria não tem registro (quem aprovou qual regra) → **LACUNA (L09)** |
 | **Ação proibida — enviar dados a terceiros** | O agente não envia e-mail, mensagem nem chama API externa com dado do usuário. | **ausência de ferramenta**: nenhuma ferramenta de envio em [A:17-26](arquitetura-v1.md?plain=1#L17-L26) | **Declarado.** Exceção não declarada: o próprio provedor do modelo recebe o dado (ver §5 e §6) |
 | **Credencial** | Conta de serviço própria do agente: leitura nas tabelas `estoque`, `perfil`, `historico`; escrita só em `estoque`, `historico` e campos não sensíveis de `perfil`; nenhum acesso a DDL nem a outras bases; segredo fora do repositório. | **plataforma** (permissões do banco, cofre de segredos) | **Não definida** ([E01.5](evidencias/E01-inventario-repositorio.txt): nenhuma ocorrência de "credencial") → **LACUNA (L10)** |
-| **Limite por execução** | 5 passos do chef, 3 rodadas de avaliação, 3 passos de estoque, 6.000 tokens, *timeout* de 15 s no texto. Declarado em [A:31-35](arquitetura-v1.md?plain=1#L31-L35) e repartição em [M:63-69](memoria.md?plain=1#L63-L69). | **código** (`Orcamento` do agente) + teste | **Não.** Sem código nem teste → **LACUNA (L11)** |
+| **Limite por execução** | 5 passos do chef, 3 rodadas de avaliação, 3 passos de estoque, 6.000 tokens, *timeout* de 15 s no texto. Declarado em [A:31-35](arquitetura-v1.md?plain=1#L31-L35) e repartição em [M:63-69](memoria-v1.md?plain=1#L63-L69). | **código** (`Orcamento` do agente) + teste | **Não.** Sem código nem teste → **LACUNA (L11)** |
 | **Limite de gasto por janela** | Não especificado. Não há valor em reais nem por dia/mês nem chave exclusiva. | **plataforma** (limite do provedor) + código | **LACUNA (L12)** — [E01.5](evidencias/E01-inventario-repositorio.txt) |
 | **Modelos aprovados / reserva** | Não especificado. | ponto de aplicação | **LACUNA (L13)** — ver §5 |
-| **Limiar de aprovação humana** | A v1 **não pausa nenhuma ação** para aprovação ([M:39-41](memoria.md?plain=1#L39-L41)). Proposta desta versão: pausar para **confirmação do próprio usuário** (1) a remoção de uma alergia ou restrição do perfil e (2) a gravação de itens de estoque ambíguos (C07, [V:20](aula-11-avaliacao.md?plain=1#L20)). | código (término "aguardando confirmação") | **Não.** Nenhuma pausa existe → **LACUNA (L14)**. A ausência de aprovação por recomendação é um **risco aceito** (R1, §9) |
+| **Limiar de aprovação humana** | A v1 **não pausa nenhuma ação** para aprovação ([M:39-41](memoria-v1.md?plain=1#L39-L41)). Proposta desta versão: pausar para **confirmação do próprio usuário** (1) a remoção de uma alergia ou restrição do perfil e (2) a gravação de itens de estoque ambíguos (C07, [V:20](aula-11-avaliacao.md?plain=1#L20)). | código (término "aguardando confirmação") | **Não.** Nenhuma pausa existe → **LACUNA (L14)**. A ausência de aprovação por recomendação é um **risco aceito** (R1, §9) |
 | **Comportamento quando um controle falha** | Proposta: *fail-closed* para as escritas e para o filtro de alergia (sem filtro, nenhuma recomendação sai); *fail-open* com registro para leitura de receitas e OMS. | código | **Não declarado** antes desta versão → **LACUNA (L15)** |
 | **Quem pode suspender o agente** | Não especificado. Proposta: o responsável de operação desativa a chave do agente; o responsável de produto decide a retomada. | código (*kill switch*) + plataforma (revogar credencial) | **LACUNA (L16)**, depende de L01 |
 | **Revisão de autoridade** | Não especificado. Proposta: a cada ferramenta ou permissão nova, comparar a autoridade efetiva com esta tabela. | processo | **LACUNA (L17)** |
@@ -83,7 +83,7 @@ A coluna **Onde deveria ser aplicado** é a decisão de projeto. A coluna
 
 | Privilégio declarado | Precisa? | Decisão |
 |---|---|---|
-| `perfil.atualizar(usuario_id, campo, valor)` disponível ao agente | **Não.** A rota "perfil" grava **por regra em código, sem LLM** ([A:50](arquitetura-v1.md?plain=1#L50), [M:104](memoria.md?plain=1#L104)). Além disso, `campo` livre permite ao modelo apagar `alergias`. | **Remover** do conjunto do agente. Fica só no código da rota de perfil (L18). |
+| `perfil.atualizar(usuario_id, campo, valor)` disponível ao agente | **Não.** A rota "perfil" grava **por regra em código, sem LLM** ([A:50](arquitetura-v1.md?plain=1#L50), [M:104](memoria-v1.md?plain=1#L104)). Além disso, `campo` livre permite ao modelo apagar `alergias`. | **Remover** do conjunto do agente. Fica só no código da rota de perfil (L18). |
 | `usuario_id` como argumento de toda ferramenta | **Não.** O usuário é conhecido pela sessão. | **Remover** o argumento e injetar o valor no código (L06). |
 | `estoque.atualizar` visível ao agente-chef e ao avaliador | **Não.** Só o agente-estoque escreve estoque ([A:53-56](arquitetura-v1.md?plain=1#L53-L56)). | **Restringir** a lista de ferramentas por subagente (L05). |
 | API Mock de preços | Citada como fonte ([B:30](base-de-conhecimento-v1.md?plain=1#L30)), mas **sem ferramenta** na arquitetura ([A:17-26](arquitetura-v1.md?plain=1#L17-L26)). | **Inconsistência** entre documentos. Declarar se entra ou não (L19). |
@@ -112,7 +112,7 @@ Todas as linhas acima são **declaradas**. Nenhuma ferramenta está implementada
 |---|---|
 | Modelo (versão datada, não *alias*) | **LACUNA (L13).** Nenhum modelo foi escolhido ([E01.4](evidencias/E01-inventario-repositorio.txt): 0 ocorrências de nome de modelo ou provedor). |
 | Modelo de visão para `extrair_da_imagem` | **LACUNA (L20).** |
-| Modelo de *embedding* do índice de receitas e da OMS | **LACUNA (L21).** Sem ele, a versão do índice não é reproduzível ([M:186-192](memoria.md?plain=1#L186-L192)). |
+| Modelo de *embedding* do índice de receitas e da OMS | **LACUNA (L21).** Sem ele, a versão do índice não é reproduzível ([M:186-192](memoria-v1.md?plain=1#L186-L192)). |
 | Provedor e região de processamento | **LACUNA (L13).** Como o perfil contém dado de saúde (§6), a região determina se há **transferência internacional** (LGPD, art. 33). |
 | Retenção no provedor e uso para treino | **LACUNA (L13).** Requisito do grupo: o provedor não pode usar os dados para treino e deve reter por, no máximo, o prazo de monitoramento de abuso. |
 | Parâmetros de amostragem | Planejados `temperature=0`, `top_p=1` para avaliação ([V:72](aula-11-avaliacao.md?plain=1#L72)). Em produção, não definidos → L13. |
@@ -125,7 +125,7 @@ Todas as linhas acima são **declaradas**. Nenhuma ferramenta está implementada
 |---|---|---|
 | Receitas Eight Portions (~125 mil), complemento Kaggle | declarada, não ingerida | [B:7](base-de-conhecimento-v1.md?plain=1#L7), [B:53](base-de-conhecimento-v1.md?plain=1#L53), [E01.1](evidencias/E01-inventario-repositorio.txt). Licença de uso **não verificada** → L22 |
 | TBCA (composição nutricional) | declarada, não ingerida | [B:24](base-de-conhecimento-v1.md?plain=1#L24). Licença não verificada → L22 |
-| Diretrizes da OMS | declaradas, com `data_publicacao` como metadado | [B:28](base-de-conhecimento-v1.md?plain=1#L28), [M:127-130](memoria.md?plain=1#L127-L130) |
+| Diretrizes da OMS | declaradas, com `data_publicacao` como metadado | [B:28](base-de-conhecimento-v1.md?plain=1#L28), [M:127-130](memoria-v1.md?plain=1#L127-L130) |
 | API Mock de preços | declarada, sem ferramenta | [B:103](base-de-conhecimento-v1.md?plain=1#L103) → L19 |
 
 ### 6.2 Inventário do dado pessoal: onde entra, onde fica, para onde vai
@@ -143,19 +143,19 @@ sistema não tem tela de consentimento nem rotina de expurgo → **LACUNA (L23)*
 | Lugar | Dado pessoal | Finalidade | Base legal | Prazo de guarda | Evidência | Minimização |
 |---|---|---|---|---|---|---|
 | **Entrada — texto** | pedido livre; pode trazer dado de saúde não pedido ("sou diabético") | entender o pedido | art. 7º, V; art. 11, I se houver saúde | duração da execução | [A:5-9](arquitetura-v1.md?plain=1#L5-L9) | ok, se não for copiado para outro lugar |
-| **Entrada — imagem** (foto, nota fiscal) | foto da casa; **nota fiscal pode conter nome, CPF, endereço e final do cartão** | extrair itens | art. 7º, V | **não retida** após a extração | [M:214-216](memoria.md?plain=1#L214-L216) | ⚠ **Fere.** O CPF e os demais dados não servem à finalidade e não são mascarados antes do envio ao modelo de visão → L24 |
-| **Prompt → provedor externo** (LLM e visão) | pedido, perfil completo (inclui saúde), estoque, histórico recente, imagem | gerar e avaliar a receita | art. 11, I (saúde) + art. 33 se houver transferência internacional | o do provedor | [M:63-69](memoria.md?plain=1#L63-L69) (o perfil entra na janela) | ⚠ **Fere.** Idade, peso, altura e rotina vão ao provedor mesmo quando o pedido não precisa deles. Provedor e retenção desconhecidos → L13, L25 |
-| **SQL `perfil`** | idade, altura, peso, objetivo, preferências, **restrições, alergias**, refeições, rotina, equipamentos | personalizar e impedir alérgeno | art. 11, I (saúde); art. 7º, V (demais) | enquanto a conta existir; apagado a pedido | [B:86-97](base-de-conhecimento-v1.md?plain=1#L86-L97), remoção em [M:167](memoria.md?plain=1#L167) | ⚠ **Fere.** Nenhuma ferramenta, regra ou caso de avaliação usa `idade`, `altura`, `peso` nem `rotina` ([A:17-26](arquitetura-v1.md?plain=1#L17-L26), [V:14-33](aula-11-avaliacao.md?plain=1#L14-L33)). Coletar só quando houver finalidade (L25) |
+| **Entrada — imagem** (foto, nota fiscal) | foto da casa; **nota fiscal pode conter nome, CPF, endereço e final do cartão** | extrair itens | art. 7º, V | **não retida** após a extração | [M:214-216](memoria-v1.md?plain=1#L214-L216) | ⚠ **Fere.** O CPF e os demais dados não servem à finalidade e não são mascarados antes do envio ao modelo de visão → L24 |
+| **Prompt → provedor externo** (LLM e visão) | pedido, perfil completo (inclui saúde), estoque, histórico recente, imagem | gerar e avaliar a receita | art. 11, I (saúde) + art. 33 se houver transferência internacional | o do provedor | [M:63-69](memoria-v1.md?plain=1#L63-L69) (o perfil entra na janela) | ⚠ **Fere.** Idade, peso, altura e rotina vão ao provedor mesmo quando o pedido não precisa deles. Provedor e retenção desconhecidos → L13, L25 |
+| **SQL `perfil`** | idade, altura, peso, objetivo, preferências, **restrições, alergias**, refeições, rotina, equipamentos | personalizar e impedir alérgeno | art. 11, I (saúde); art. 7º, V (demais) | enquanto a conta existir; apagado a pedido | [B:86-97](base-de-conhecimento-v1.md?plain=1#L86-L97), remoção em [M:167](memoria-v1.md?plain=1#L167) | ⚠ **Fere.** Nenhuma ferramenta, regra ou caso de avaliação usa `idade`, `altura`, `peso` nem `rotina` ([A:17-26](arquitetura-v1.md?plain=1#L17-L26), [V:14-33](aula-11-avaliacao.md?plain=1#L14-L33)). Coletar só quando houver finalidade (L25) |
 | **SQL `estoque`** | itens, quantidades, datas de compra (revelam hábito de consumo) | recomendar com o que existe | art. 7º, V | enquanto a conta existir | [B:77-84](base-de-conhecimento-v1.md?plain=1#L77-L84) | ok |
-| **Histórico de recomendações** (SQL + índice vetorial) | receita, data, kcal, rejeição implícita, **embedding do par pedido+receita** | não repetir receita; inferir preferência | art. 7º, V | **sem prazo final**: após 90 dias é rebaixado, **não removido** | [M:91](memoria.md?plain=1#L91), [M:140-152](memoria.md?plain=1#L140-L152) | ⚠ **Fere.** Guarda por tempo indefinido. A finalidade declarada ("não repetir receita recente") se esgota em 90 dias → L26 |
-| **Checkpoint** | `usuario_id`, `entrada_bruta`, `estoque_snapshot`, **`perfil_snapshot` (saúde)** | retomar e depurar | art. 7º, V | "prazo curto", **não fixado** | [M:25](memoria.md?plain=1#L25), [M:46](memoria.md?plain=1#L46), [M:52-55](memoria.md?plain=1#L52-L55) | ⚠ **Fere.** (1) prazo não definido; (2) duplica o perfil de saúde inteiro; (3) `entrada_bruta` guarda "referência à imagem", o que contradiz "imagem não retida" ([M:214](memoria.md?plain=1#L214)): se há referência, a imagem está guardada em algum lugar → L27 |
-| **Registro de execução (logs/trace)** | argumentos das ferramentas com `usuario_id`; formato do restante não definido | prova e depuração | art. 7º, V e art. 7º, IX (legítimo interesse, para segurança) | **não fixado** | [M:171](memoria.md?plain=1#L171) | ⚠ Prazo e conteúdo não definidos → L28 |
-| **Memória procedural** (texto no prompt) | nenhum, por regra (regras são gerais, curadas) | — | — | até revisão | [M:93](memoria.md?plain=1#L93), [M:172](memoria.md?plain=1#L172) | ok, mas depende de curadoria sem registro (L09) |
+| **Histórico de recomendações** (SQL + índice vetorial) | receita, data, kcal, rejeição implícita, **embedding do par pedido+receita** | não repetir receita; inferir preferência | art. 7º, V | **sem prazo final**: após 90 dias é rebaixado, **não removido** | [M:91](memoria-v1.md?plain=1#L91), [M:140-152](memoria-v1.md?plain=1#L140-L152) | ⚠ **Fere.** Guarda por tempo indefinido. A finalidade declarada ("não repetir receita recente") se esgota em 90 dias → L26 |
+| **Checkpoint** | `usuario_id`, `entrada_bruta`, `estoque_snapshot`, **`perfil_snapshot` (saúde)** | retomar e depurar | art. 7º, V | "prazo curto", **não fixado** | [M:25](memoria-v1.md?plain=1#L25), [M:46](memoria-v1.md?plain=1#L46), [M:52-55](memoria-v1.md?plain=1#L52-L55) | ⚠ **Fere.** (1) prazo não definido; (2) duplica o perfil de saúde inteiro; (3) `entrada_bruta` guarda "referência à imagem", o que contradiz "imagem não retida" ([M:214](memoria-v1.md?plain=1#L214)): se há referência, a imagem está guardada em algum lugar → L27 |
+| **Registro de execução (logs/trace)** | argumentos das ferramentas com `usuario_id`; formato do restante não definido | prova e depuração | art. 7º, V e art. 7º, IX (legítimo interesse, para segurança) | **não fixado** | [M:171](memoria-v1.md?plain=1#L171) | ⚠ Prazo e conteúdo não definidos → L28 |
+| **Memória procedural** (texto no prompt) | nenhum, por regra (regras são gerais, curadas) | — | — | até revisão | [M:93](memoria-v1.md?plain=1#L93), [M:172](memoria-v1.md?plain=1#L172) | ok, mas depende de curadoria sem registro (L09) |
 | **Golden dataset de avaliação** | nenhum hoje (todos sintéticos) | avaliação | — | — | [V:35](aula-11-avaliacao.md?plain=1#L35) | ⚠ O plano é incluir "incidentes reais anonimizados". A anonimização precisa de procedimento verificável → L29 |
 
 **Remoção a pedido do titular** (LGPD, art. 18, VI): o procedimento cobre perfil,
 estoque, histórico, checkpoints, logs e memória procedural, e tem verificação
-por `usuario_id` sintético ([M:165-181](memoria.md?plain=1#L165-L181)). **Não
+por `usuario_id` sintético ([M:165-181](memoria-v1.md?plain=1#L165-L181)). **Não
 foi executado nenhuma vez.** Também não cobre a cópia no provedor externo nem
 o golden dataset → **LACUNA (L30)**.
 
@@ -181,7 +181,7 @@ cada um com o caso de teste que o exercitaria.
 | Item ambíguo ("leite") pode ser casado com a variante errada. | [V:20](aula-11-avaliacao.md?plain=1#L20) (C07) |
 | Ingrediente ausente na TBCA impede o cálculo; o agente pode inventar kcal. | [V:29](aula-11-avaliacao.md?plain=1#L29) (C16) |
 | Texto de receita recuperada pode conter instrução maliciosa (injeção indireta). | [V:33](aula-11-avaliacao.md?plain=1#L33) (C20) |
-| Mesmo pedido gera respostas diferentes conforme a memória muda; não é reproduzível sem *snapshot*. | [M:196-209](memoria.md?plain=1#L196-L209) |
+| Mesmo pedido gera respostas diferentes conforme a memória muda; não é reproduzível sem *snapshot*. | [M:196-209](memoria-v1.md?plain=1#L196-L209) |
 
 **Casos em que o agente não deve ser usado, mesmo dentro da finalidade:**
 alergia com histórico de anafilaxia, doença que exige dieta terapêutica
@@ -198,9 +198,9 @@ aparecem aqui ainda precisam do aceite formal do responsável de risco (L01) →
 
 | ID | Risco | Razão para aceitar | O que o limita | Registro |
 |---|---|---|---|---|
-| R1 | Nenhuma recomendação passa por aprovação humana antes de chegar ao usuário. | A ação é uma sugestão. O usuário decide se cozinha, e nenhuma escrita é irreversível. | Filtro determinístico de alergia (**ainda não existe**, L07). **Sem L07 resolvida, R1 não pode ser aceito.** | [M:39-41](memoria.md?plain=1#L39-L41), [A:119](arquitetura-v1.md?plain=1#L119) |
-| R2 | Entre a remoção lógica (*tombstone*) e a reconstrução do índice vetorial, o vetor de um titular removido ainda influencia buscas. | Custo de reconstruir o índice a cada pedido. | Janela de manutenção do índice (prazo **não fixado**, L30). | [M:186-192](memoria.md?plain=1#L186-L192) |
-| R3 | O sistema não é reproduzível sobre o estado de produção. | É consequência deliberada da memória. | Avaliação roda sobre *snapshots* congelados. | [M:196-209](memoria.md?plain=1#L196-L209), [V:72](aula-11-avaliacao.md?plain=1#L72) |
+| R1 | Nenhuma recomendação passa por aprovação humana antes de chegar ao usuário. | A ação é uma sugestão. O usuário decide se cozinha, e nenhuma escrita é irreversível. | Filtro determinístico de alergia (**ainda não existe**, L07). **Sem L07 resolvida, R1 não pode ser aceito.** | [M:39-41](memoria-v1.md?plain=1#L39-L41), [A:119](arquitetura-v1.md?plain=1#L119) |
+| R2 | Entre a remoção lógica (*tombstone*) e a reconstrução do índice vetorial, o vetor de um titular removido ainda influencia buscas. | Custo de reconstruir o índice a cada pedido. | Janela de manutenção do índice (prazo **não fixado**, L30). | [M:186-192](memoria-v1.md?plain=1#L186-L192) |
+| R3 | O sistema não é reproduzível sobre o estado de produção. | É consequência deliberada da memória. | Avaliação roda sobre *snapshots* congelados. | [M:196-209](memoria-v1.md?plain=1#L196-L209), [V:72](aula-11-avaliacao.md?plain=1#L72) |
 | R4 | O roteador LLM pode deixar passar um pedido fora de escopo (falso negativo). | Um classificador de conteúdo sempre tem falso negativo. | Ausência de ferramenta de prescrição e de envio: no pior caso, o dano é **texto**, não ação. Mitigação de texto = L03. | só neste documento |
 | R5 | Valores de kcal e proteína podem divergir do real por imprecisão da TBCA e das quantidades. | Limite da fonte. | Resposta cita a ferramenta e não arredonda para "exato" (C14, C16). | só neste documento |
 
@@ -208,8 +208,8 @@ aparecem aqui ainda precisam do aceite formal do responsável de risco (L01) →
 
 | Afirmação | Evidência |
 |---|---|
-| Nenhuma ação do fluxo pausa para aprovação humana na v1. | [M:39-41](memoria.md?plain=1#L39-L41) |
-| O único ponto com humano é a **curadoria da memória procedural**: uma regra aprendida só vale depois de revisão humana. | [M:93](memoria.md?plain=1#L93), [M:104-110](memoria.md?plain=1#L104-L110). Quem cura, em que prazo e onde fica o registro → **LACUNA (L09)** |
+| Nenhuma ação do fluxo pausa para aprovação humana na v1. | [M:39-41](memoria-v1.md?plain=1#L39-L41) |
+| O único ponto com humano é a **curadoria da memória procedural**: uma regra aprendida só vale depois de revisão humana. | [M:93](memoria-v1.md?plain=1#L93), [M:104-110](memoria-v1.md?plain=1#L104-L110). Quem cura, em que prazo e onde fica o registro → **LACUNA (L09)** |
 | Supervisão *on-the-loop*: alguém monitora negações, gasto e recusas. | **LACUNA (L16, L28).** Não há painel, alerta nem responsável. |
 | Interrupção: quem pode, como, em que estado o sistema fica, como se testa. | **LACUNA (L16).** Nenhum dos quatro itens está definido nem foi exercitado. |
 
@@ -217,8 +217,8 @@ aparecem aqui ainda precisam do aceite formal do responsável de risco (L01) →
 
 | Afirmação | Evidência |
 |---|---|
-| O checkpoint de cada execução registra entrada bruta, snapshots de estoque e perfil, receita de cada rodada, contadores e veredito com motivo. | declarado em [M:45-55](memoria.md?plain=1#L45-L55) |
-| O descarte de um trecho antigo da OMS é registrado no log da avaliação. | declarado em [M:132-137](memoria.md?plain=1#L132-L137) |
+| O checkpoint de cada execução registra entrada bruta, snapshots de estoque e perfil, receita de cada rodada, contadores e veredito com motivo. | declarado em [M:45-55](memoria-v1.md?plain=1#L45-L55) |
+| O descarte de um trecho antigo da OMS é registrado no log da avaliação. | declarado em [M:132-137](memoria-v1.md?plain=1#L132-L137) |
 | **O registro de decisão completo** R = (id, t, x, C, V, Φ, P, H, y): a versão do modelo **pedido e servido**, do prompt e do índice; a política avaliada; a revisão humana, inclusive a ausência registrada; o `recomendacao_id` citado na resposta ao usuário. | **LACUNA (L28).** O checkpoint não tem versões (V), política (P) nem revisão (H). A resposta ao usuário ([A:105](arquitetura-v1.md?plain=1#L105)) não cita identificador. |
 | Prazo de guarda do registro. | **LACUNA (L28).** Proposta: 90 dias, igual à janela de histórico útil, com eliminação registrada. |
 | Quem tem acesso ao registro; armazenamento *append-only*. | **LACUNA (L28).** |

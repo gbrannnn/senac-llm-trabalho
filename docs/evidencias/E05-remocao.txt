@@ -1,0 +1,11 @@
+# E05 — remocao: gravar, ver o efeito, remover, ver voltar, varrer
+# commit: 4bfead4+alteracoes · data: 2026-10-20T22:51:18
+# modelo: {"modelo": "nutri-qwen", "digest": "90eb002e84db", "embedding": "bge-m3", "digest_embedding": "790764642607"}
+$ python -m scripts.experimentos remocao
+
+1. com dados  : recomendacao | Sugestão: Smashed Twice-Cooked Potatoes with Leeks and Green Garlic. A receita de 'Smashed Twice-Cooked Potatoes with Leeks and Green Garlic' usa ingredientes q
+   varredura  : {"perfil": 1, "estoque": 7, "historico": 1, "escritas": 4, "sql.texto_livre": 0, "checkpoint.bytes": 990, "dominio.bytes": 21, "logs": 1, "memoria_procedural": 0, "corpus_receitas_oms": 0, "limpo": false}
+2. remoção    : {"perfil": 1, "estoque": 7, "historico": 1, "escritas": 4, "checkpoint.checkpoints": 14, "checkpoint.writes": 80, "logs.apagados": 1, "logs.redigidos": 0}
+3. varredura  : {"perfil": 0, "estoque": 0, "historico": 0, "escritas": 0, "sql.texto_livre": 0, "checkpoint.bytes": 0, "dominio.bytes": 0, "logs": 0, "memoria_procedural": 0, "corpus_receitas_oms": 0, "limpo": true}
+4. sem dados  : pergunta | Ainda não conheço você. Antes de recomendar, me diga: qual é o seu objetivo (ex.: emagrecer, manter o peso, ganhar massa) e se você tem alguma alergia ou restri
+   (o log desta última execução é novo: a pessoa voltou a falar com o sistema)
