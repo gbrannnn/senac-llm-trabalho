@@ -1,6 +1,6 @@
 # RAG — o conhecimento de domínio que os agentes consultam
 
-**Versão do sistema:** commit `d16e6b7` · índices `idx-receitas-60d982053e0f` e `idx-oms-9ee6cda7b95b` · código em [src/rag.py](../src/rag.py), [src/ferramentas.py](../src/ferramentas.py), [src/citacao.py](../src/citacao.py)
+**Versão do sistema:** commit `fffe38f` · índices `idx-receitas-60d982053e0f` e `idx-oms-9ee6cda7b95b` · código em [src/rag.py](../src/rag.py), [src/ferramentas.py](../src/ferramentas.py), [src/citacao.py](../src/citacao.py)
 
 **A resposta direta:** o nosso RAG é **os dois**:
 - **consulta estruturada** para o que é registro: composição na TBCA, estoque, perfil e histórico;

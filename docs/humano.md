@@ -1,6 +1,6 @@
 # Human-in-the-loop — onde o grafo para, e o que acontece se ninguém responder
 
-**Versão do sistema:** commit `d16e6b7` · código em [src/grafo.py](../src/grafo.py) (`casar_catalogo`, `pausa_estoque`, `confirmar_estoque`, `extrair_perfil`, `confirmar_perfil`) e [src/main.py](../src/main.py)
+**Versão do sistema:** commit `fffe38f` · código em [src/grafo.py](../src/grafo.py) (`casar_catalogo`, `pausa_estoque`, `confirmar_estoque`, `extrair_perfil`, `confirmar_perfil`) e [src/main.py](../src/main.py)
 
 ## 8.1 Onde o grafo para, e por qual critério
 
@@ -18,7 +18,7 @@ O sistema **não move dinheiro nem escreve em sistema de terceiro**. Por isso o 
 
 ## 8.2 O que a pessoa vê, e o que ela devolve
 
-O texto da pausa é um prompt versionado ([pausa_estoque.md](../src/prompts/pausa_estoque.md)), sem LLM. Ele mostra **a ação exata, com os argumentos e a consequência**. Copiado do log `caso6a_pausa` (commit `d16e6b7`):
+O texto da pausa é um prompt versionado ([pausa_estoque.md](../src/prompts/pausa_estoque.md)), sem LLM. Ele mostra **a ação exata, com os argumentos e a consequência**. Copiado do log `caso6a_pausa` (commit `fffe38f`):
 
 ```text
 Vou SOMAR estes itens ao seu estoque (ana):

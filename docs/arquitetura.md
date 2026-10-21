@@ -1,6 +1,6 @@
 # Arquitetura — Agente Nutricionista Pessoal (v2)
 
-**Versão do sistema:** commit `d16e6b7` · **Data:** 20/10/2026 · substitui [arquitetura-v1.md](arquitetura-v1.md) (o histórico das decisões está em [case.md §0.5](case.md#05-o-que-mudou-de-ideia-desde-a-v1-e-por-quê))
+**Versão do sistema:** commit `fffe38f` · **Data:** 20/10/2026 · substitui [arquitetura-v1.md](arquitetura-v1.md) (o histórico das decisões está em [case.md §0.5](case.md#05-o-que-mudou-de-ideia-desde-a-v1-e-por-quê))
 
 O grafo detalhado (padrões, quem decide cada aresta, o que o framework não deu) está em [grafo.md](grafo.md). Este documento é a visão do sistema inteiro.
 

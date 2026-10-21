@@ -56,7 +56,7 @@ Usuários fictícios já criados: **ana** (perfil completo, estoque com 18 itens
 
 ### O exemplo principal
 
-Copiado do log [`logs/20261020-230141_caso1.jsonl`](logs/20261020-230141_caso1.jsonl) (commit `d16e6b7`). A saída completa e outros exemplos estão em [docs/io.md](docs/io.md).
+Copiado do log [`logs/20261020-230141_caso1.jsonl`](logs/20261020-230141_caso1.jsonl) (commit `fffe38f`). A saída completa e outros exemplos estão em [docs/io.md](docs/io.md).
 
 ```text
 $ python -m src.main --usuario ana --sessao caso1 "oi! o que eu posso fazer pra jantar hoje?"
@@ -86,6 +86,8 @@ Sugestão: Stir-Fried Black Rice with Fried Egg and Roasted Broccoli. Usa arroz,
 }
 ```
 *(campos `ingredientes`, `detalhe` e `uso` omitidos aqui; estão completos em [docs/io.md](docs/io.md))*
+
+> **Sobre os hashes nos logs:** os logs em `logs/` e as evidências em `docs/evidencias/` registram o commit `d16e6b7`. Esse é o mesmo código do commit `fffe38f` (a árvore é idêntica): só a mensagem do commit foi reescrita antes do envio.
 
 **Como interpretar:**
 - `faltando_no_estoque` vazio: dá para fazer agora. O brócolis do nome é acompanhamento opcional, "(for serving)".

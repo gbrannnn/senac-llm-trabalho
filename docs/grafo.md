@@ -1,6 +1,6 @@
 # O grafo — desenho, padrões, estado e o que o framework não deu
 
-**Versão do sistema:** commit `d16e6b7` · LangGraph 1.2.16 · código em [src/grafo.py](../src/grafo.py)
+**Versão do sistema:** commit `fffe38f` · LangGraph 1.2.16 · código em [src/grafo.py](../src/grafo.py)
 
 O desenho ASCII completo, com `[M]`/`[C]`/`⏸`, e a saída do `conferir_grafo.py` ao lado estão em [arquitetura.md §3.1 e §6.1](arquitetura.md#31-o-diagrama). Aqui ficam as decisões.
 

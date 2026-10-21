@@ -1,6 +1,6 @@
 # Entrada e saída — o contrato do sistema
 
-**Versão do sistema:** commit `d16e6b7` · schemas em [src/esquemas.py](../src/esquemas.py) · exemplos **copiados dos logs** por script, e não escritos à mão. Os seis casos completos do §9 estão em [logs/](../logs/) (`caso1` … `caso6d`).
+**Versão do sistema:** commit `fffe38f` · schemas em [src/esquemas.py](../src/esquemas.py) · exemplos **copiados dos logs** por script, e não escritos à mão. Os seis casos completos do §9 estão em [logs/](../logs/) (`caso1` … `caso6d`).
 
 ## 1.1 A entrada é texto
 
@@ -38,7 +38,7 @@ A **recusa** é parte do contrato: `tipo: recusa`, `suficiencia: insuficiente` o
 
 ## 9. Os seis casos demonstrados
 
-Gerados por `python -m scripts.preparar --banco && python -m scripts.demonstrar` no commit `d16e6b7`, em 20/10/2026, a partir do estado inicial dos usuários fictícios.
+Gerados por `python -m scripts.preparar --banco && python -m scripts.demonstrar` no commit `fffe38f`, em 20/10/2026, a partir do estado inicial dos usuários fictícios.
 
 | # | O caso | Entrada | Log | O que prova |
 |---|---|---|---|---|
@@ -55,7 +55,7 @@ Logs extras da mesma rodada: [`io_incompleta`](../logs/20261020-230218_io_incomp
 
 ### 1. O caminho feliz
 
-**Commit:** `d16e6b7` · **data:** 2026-10-20T23:01:41 · **log:** [`logs/20261020-230141_caso1.jsonl`](../logs/20261020-230141_caso1.jsonl) · **usuário:** `ana` (fictício)
+**Commit:** `fffe38f` · **data:** 2026-10-20T23:01:41 · **log:** [`logs/20261020-230141_caso1.jsonl`](../logs/20261020-230141_caso1.jsonl) · **usuário:** `ana` (fictício)
 
 **Entrada exata:**
 
@@ -145,7 +145,7 @@ oi! o que eu posso fazer pra jantar hoje?
 
 ### 2. A recusa
 
-**Commit:** `d16e6b7` · **data:** 2026-10-20T23:02:05 · **log:** [`logs/20261020-230205_caso5.jsonl`](../logs/20261020-230205_caso5.jsonl) · **usuário:** `ana` (fictício)
+**Commit:** `fffe38f` · **data:** 2026-10-20T23:02:05 · **log:** [`logs/20261020-230205_caso5.jsonl`](../logs/20261020-230205_caso5.jsonl) · **usuário:** `ana` (fictício)
 
 **Entrada exata:**
 
@@ -185,7 +185,7 @@ o que a OMS recomenda sobre cafeína na gravidez?
 
 ### 3. Entrada incompleta (§1.4)
 
-**Commit:** `d16e6b7` · **data:** 2026-10-20T23:02:18 · **log:** [`logs/20261020-230218_io_incompleta.jsonl`](../logs/20261020-230218_io_incompleta.jsonl) · **usuário:** `carla` (fictício)
+**Commit:** `fffe38f` · **data:** 2026-10-20T23:02:18 · **log:** [`logs/20261020-230218_io_incompleta.jsonl`](../logs/20261020-230218_io_incompleta.jsonl) · **usuário:** `carla` (fictício)
 
 **Entrada exata:**
 
@@ -225,7 +225,7 @@ o que eu faço pra janta?
 
 ### 4. Entrada ambígua (§1.4) — e a pausa para aprovação
 
-**Commit:** `d16e6b7` · **data:** 2026-10-20T23:02:16 · **log:** [`logs/20261020-230216_caso6a_pausa.jsonl`](../logs/20261020-230216_caso6a_pausa.jsonl) · **usuário:** `ana` (fictício)
+**Commit:** `fffe38f` · **data:** 2026-10-20T23:02:16 · **log:** [`logs/20261020-230216_caso6a_pausa.jsonl`](../logs/20261020-230216_caso6a_pausa.jsonl) · **usuário:** `ana` (fictício)
 
 **Entrada exata:**
 
@@ -298,7 +298,7 @@ comprei leite e 6 ovos
 
 ### 5. Fora do escopo, e o caso que não deve disparar a ação (§1.4, §3.3)
 
-**Commit:** `d16e6b7` · **data:** 2026-10-20T23:02:04 · **log:** [`logs/20261020-230204_caso4.jsonl`](../logs/20261020-230204_caso4.jsonl) · **usuário:** `ana` (fictício)
+**Commit:** `fffe38f` · **data:** 2026-10-20T23:02:04 · **log:** [`logs/20261020-230204_caso4.jsonl`](../logs/20261020-230204_caso4.jsonl) · **usuário:** `ana` (fictício)
 
 **Entrada exata:**
 

@@ -2,7 +2,7 @@
 
 **Versão do documento:** 1.0.0 · **Data:** 16/10/2026 · **Commit descrito:** `d2eb10a` · **Exercício:** Aula 12 — Governança
 
-> **Nota de 20/10/2026 (Parte 2).** Este card descreve o sistema **antes do código** (commit `d2eb10a`), e o texto abaixo continua valendo como registro daquele estado. A Parte 2 (commit `d16e6b7`) fechou parte das lacunas, com evidência:
+> **Nota de 20/10/2026 (Parte 2).** Este card descreve o sistema **antes do código** (commit `d2eb10a`), e o texto abaixo continua valendo como registro daquele estado. A Parte 2 (commit `fffe38f`) fechou parte das lacunas, com evidência:
 > - **L05:** ferramentas implementadas, só de leitura, com lista por agente ([arquitetura.md §3.2](arquitetura.md#as-ferramentas)).
 > - **L06:** `usuario_id` injetado pelo código ([ferramentas.py](../src/ferramentas.py) `Ctx`).
 > - **L07:** alérgeno barrado por dois controles em código ([test_portao.py](../tests/test_portao.py)).

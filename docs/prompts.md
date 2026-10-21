@@ -1,6 +1,6 @@
 # Plano de prompt engineering
 
-**Versão do sistema:** commit `d16e6b7` · modelo `nutri-qwen` (qwen2.5 7B instruct Q4_K_M, digest `90eb002e84db`, `num_ctx` 8192) · `temperature=0`, `top_p=1`
+**Versão do sistema:** commit `fffe38f` · modelo `nutri-qwen` (qwen2.5 7B instruct Q4_K_M, digest `90eb002e84db`, `num_ctx` 8192) · `temperature=0`, `top_p=1`
 
 Os prompts são **fonte** e moram em [src/prompts/](../src/prompts/), um arquivo por etapa, com `id` e `versao` no cabeçalho. Eles são carregados em tempo de execução ([src/prompts.py](../src/prompts.py)). Todo log começa com a combinação que rodou: `versão@hash` de cada prompt, modelo e digest, parâmetros e versão dos índices ([registro.py](../src/registro.py)). A combinação da rodada oficial:
 
@@ -27,7 +27,7 @@ regras_procedurais 1.0.0@7e9dafef93   sistema 1.0.0@bac3e62b4c   triagem 1.1.0@0
 
 ## 2.2 Os prompts em arquivo, e o histórico das versões
 
-As versões abaixo de cada prompt foram feitas durante o desenvolvimento, **antes do primeiro commit** (`df4bf91`). Por isso o git só tem a versão final. O motivo de cada mudança ficou registrado aqui. A partir de agora, cada mudança é um commit.
+As versões abaixo de cada prompt foram feitas durante o desenvolvimento, **antes do primeiro commit** (`8a43305`). Por isso o git só tem a versão final. O motivo de cada mudança ficou registrado aqui. A partir de agora, cada mudança é um commit.
 
 | Prompt | Versão | O que mudou | Por quê (o que o log mostrou) |
 |---|---|---|---|

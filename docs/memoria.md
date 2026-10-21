@@ -1,6 +1,6 @@
 # Memória — o que o agente lembra, o que esquece, e a conversa
 
-**Versão do sistema:** commit `d16e6b7` · código em [src/db.py](../src/db.py), [src/memoria.py](../src/memoria.py), [src/estado.py](../src/estado.py), [src/remover.py](../src/remover.py)
+**Versão do sistema:** commit `fffe38f` · código em [src/db.py](../src/db.py), [src/memoria.py](../src/memoria.py), [src/estado.py](../src/estado.py), [src/remover.py](../src/remover.py)
 
 As decisões de projeto estão em [memoria-v1.md](memoria-v1.md), escrito antes do código. Este documento diz o que foi **implementado**, o que mudou e o que foi medido. Quando os dois divergem, vale este.
 
