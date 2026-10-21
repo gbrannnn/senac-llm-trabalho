@@ -619,9 +619,10 @@ def montar_saida(estado: Estado) -> esquemas.Saida:
             return esquemas.Saida(**base, tipo="resposta", resultado=r["resposta"], suficiencia="suficiente")
         # Na recusa, o texto é montado por CÓDIGO a partir do que as buscas não acharam:
         # o texto do modelo, quando ele não tem base, tende a completar com conhecimento próprio.
+        vazias = [f"{x['indice']}:'{x['consulta']}'" for x in estado.get("recuperacoes", []) if not x["ids"]]
         return esquemas.Saida(**base, tipo="recusa", suficiencia="insuficiente", resultado=_recusa_consulta(estado),
-                              motivo_suficiencia=f"término: {termino}; buscas sem resultado: "
-                              + "; ".join(f"{x['indice']}:'{x['consulta']}'" for x in estado.get("recuperacoes", []) if not x["ids"]))
+                              motivo_suficiencia=f"término: {termino}; " + ("buscas sem resultado: " + "; ".join(vazias)
+                                                  if vazias else "; ".join(estado.get("escolhas", []))))
     # recomendação
     if termino == "concluido":
         receita = rag.receitas_por_id()[estado["proposta"]["receita_id"]]
@@ -632,8 +633,11 @@ def montar_saida(estado: Estado) -> esquemas.Saida:
                                    faltando_no_estoque=sorted(set(receita["itens"]) - ctx.disponiveis), nutricao=nut)
         kcal = f" A receita inteira tem cerca de {nut.energia_kcal:.0f} kcal e {nut.proteina_g:.0f} g de proteína (TBCA)." if nut else ""
         repetida = " (Essa recomendação já estava registrada hoje.)" if efeito.get("ja_existia") else ""
+        justificativa, trocada = _justificativa(estado["proposta"]["justificativa"], receita)
+        if trocada:
+            base["escolhas_declaradas"] = base["escolhas_declaradas"] + [trocada]
         return esquemas.Saida(**base, tipo="recomendacao", receita=rs, suficiencia="suficiente",
-                              resultado=f"Sugestão: {receita['nome']}. {estado['proposta']['justificativa']}{kcal}{repetida}")
+                              resultado=f"Sugestão: {receita['nome']}. {justificativa}{kcal}{repetida}")
     motivos = {"teto_rodadas": "nenhuma das propostas passou na avaliação",
                "recusa_sem_base": "não encontrei receita no acervo que sirva",
                "teto_passos": "atingi o limite de passos da busca", "laco_detectado": "a busca entrou em repetição",
@@ -642,6 +646,22 @@ def montar_saida(estado: Estado) -> esquemas.Saida:
                           resultado=f"Não tenho uma recomendação segura agora: {motivos.get(termino, termino)}. "
                                     "Me diga outro ingrediente que você tenha, ou registre suas compras.",
                           motivo_suficiencia=motivos.get(termino, termino))
+
+
+# Promessa de benefício e adjetivo de saúde: o prompt do chef proíbe (v1.3.0) e o modelo
+# escreve mesmo assim ("ajuda na manutenção do peso", "leve e saudável" para 1.914 kcal).
+_PROMESSA = re.compile(r"saud[aá]vel|ajuda(r)? (a|na|no)|[oó]tima op[cç][aã]o|boa op[cç][aã]o|leve\b|emagrec|"
+                       r"manuten[cç][aã]o do peso|manter o peso|ganho de massa|nutritiv", re.I)
+
+
+def _justificativa(texto: str, receita: dict) -> tuple[str, str | None]:
+    """Regra em código para o que a regra no prompt não garantiu: sem promessa de saúde.
+    Se houver, a justificativa vira um texto determinístico (o que a receita usa) e a troca é declarada."""
+    if not _PROMESSA.search(texto):
+        return texto, None
+    usados = ", ".join(catalogo.itens()[i]["nome"] for i in receita["itens"])
+    return (f"Usa {usados}, que estão no seu estoque.",
+            f"justificativa do modelo substituída por texto em código: prometia benefício ('{_PROMESSA.search(texto).group(0)}')")
 
 
 def _recusa_consulta(estado: Estado) -> str:
@@ -659,6 +679,8 @@ def _fontes_da_rota(estado: Estado, fontes: list[dict]) -> list[dict]:
     rota, termino = (estado.get("triagem") or {}).get("rota"), estado.get("termino")
     if termino in ("recusa_fora_escopo", "sem_acao", "erro_fatal"):
         return []
+    if rota == "pergunta" and termino != "concluido":
+        return []  # na recusa, o que foi recuperado NÃO sustentou nada — listar seria fingir fonte
     permitidos = {"pergunta": {"oms", "tbca"}, "estoque": {"usuario", "estoque"}, "perfil": {"usuario", "perfil"}}.get(rota)
     return [f for f in fontes if permitidos is None or f["tipo"] in permitidos]
 
@@ -695,8 +717,8 @@ def saida_da_pausa(estado: Estado, pausa: dict) -> esquemas.Saida:
     """A execução parou num `interrupt`: a saída diz o que espera e até quando."""
     return esquemas.Saida(execucao_id=estado["execucao_id"], thread_id=estado["thread_id"], tipo="aguardando_aprovacao",
                           resultado=pausa["texto"], suficiencia="suficiente", pendencia=pausa,
-                          fontes=_sem_repetir(estado.get("fontes", [])), escolhas_declaradas=estado.get("escolhas", []),
-                          termino="aguardando_humano")
+                          fontes=_fontes_da_rota(estado, _sem_repetir(estado.get("fontes", []))),
+                          escolhas_declaradas=estado.get("escolhas", []), termino="aguardando_humano")
 
 
 # --- montagem -------------------------------------------------------------------------

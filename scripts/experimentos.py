@@ -96,8 +96,8 @@ def remocao():
     alvo = "titular_teste_7f3a"
     with evidencia("E05", "remocao: gravar, ver o efeito, remover, ver voltar, varrer", "python -m scripts.experimentos remocao"):
         db.atualizar_perfil(alvo, "objetivo", "definir", "emagrecimento")
-        db.atualizar_perfil(alvo, "alergias", "adicionar", "ovo")
-        db.somar_estoque(alvo, [{"item_id": i, "quantidade": 1, "unidade": "un"} for i in ("ovo", "batata", "manteiga", "alho", "cebola", "ervas", "limao")])
+        db.atualizar_perfil(alvo, "alergias", "adicionar", "camarão")
+        db.somar_estoque(alvo, [{"item_id": i, "quantidade": 1, "unidade": "un"} for i in ("frango", "arroz", "batata", "manteiga", "alho", "cebola", "ervas", "limao")])
         s = executar(alvo, "s1", "o que eu como hoje?", nome_log=f"E05_{alvo}_antes")["saida"]
         print("1. com dados  :", s["tipo"], "|", s["resultado"][:160])
         print("   varredura  :", json.dumps(remover.varrer(alvo)))

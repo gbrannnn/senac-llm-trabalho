@@ -62,3 +62,17 @@ def test_terceira_reprovacao_encerra():
 def test_marcador_de_alergia(dito):
     from src import memoria
     assert memoria.marcadores_de_alergia([dito])[0] == {"amendoim"}
+
+
+@pytest.mark.parametrize("texto,trocada", [
+    ("Usa arroz e ovo, que você já tem.", False),
+    ("É uma ótima opção para manter o peso.", True),
+    ("A receita é leve e saudável.", True),
+    ("Ajuda na manutenção do peso.", True),
+])
+def test_justificativa_sem_promessa_de_saude(texto, trocada):
+    r = receita_com("frango")
+    novo, motivo = grafo._justificativa(texto, r)
+    assert (motivo is not None) == trocada
+    if trocada:
+        assert "estoque" in novo and not grafo._PROMESSA.search(novo)
