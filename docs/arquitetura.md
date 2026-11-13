@@ -56,6 +56,9 @@ Legenda: `[M]` o **modelo** decide · `[C]` o **código** decide · `[M+C]` o mo
  [C] registrar ── histórico (episódica), chave usuário+dia+receita
         |
         v
+ [M+C] traduzir_receita ── nome e ingredientes em PT [M]; cada linha conferida [C]: número, unidade e ingrediente
+        |              iguais ao original, senão a linha fica em inglês
+        v
  [C] finalizar ── monta Saida (Pydantic): resultado, fontes, suficiência, escolhas, término
         |
         v
@@ -99,7 +102,7 @@ Quando o modelo responde em texto em vez de chamar a ferramenta final (o qwen 7B
 
 ### O estado
 
-Objeto explícito, com 34 campos. A tabela completa está em [§7.1 abaixo](#71-os-campos-do-estado-e-quem-mexe-em-cada-um). A lista de mensagens do agente (`agente_msgs`) é só o rascunho do turno; decisão, contador e identificador **não** moram nela.
+Objeto explícito, com 35 campos. A tabela completa está em [§7.1 abaixo](#71-os-campos-do-estado-e-quem-mexe-em-cada-um). A lista de mensagens do agente (`agente_msgs`) é só o rascunho do turno; decisão, contador e identificador **não** moram nela.
 
 ### O orçamento
 
@@ -168,17 +171,17 @@ Cada um desses saiu do modelo depois de um log mostrar que ele errava (ver [prom
 
 ## 6.1 / 6.4 O grafo desenhado e a conferência contra o código
 
-O desenho acima tem 24 nós de trabalho. A conferência importa **o mesmo objeto** que `src/main.py` executa (`src.grafo.obter_grafo`):
+O desenho acima tem 25 nós de trabalho. A conferência importa **o mesmo objeto** que `src/main.py` executa (`src.grafo.obter_grafo`):
 
 ```text
 $ python conferir_grafo.py
-NÓS (26):
+NÓS (27):
   __start__, inicio, carregar_perfil, carregar_estoque, carregar_historico, triagem, recusar, nao_agir,
-  checar_pedido, chef, ferramentas_chef, conferir_proposta, avaliador, registrar, consultor,
-  ferramentas_consultor, verificar_resposta, extrair_itens, casar_catalogo, confirmar_estoque,
+  checar_pedido, chef, ferramentas_chef, conferir_proposta, avaliador, registrar, traduzir_receita,
+  consultor, ferramentas_consultor, verificar_resposta, extrair_itens, casar_catalogo, confirmar_estoque,
   gravar_estoque, extrair_perfil, confirmar_perfil, gravar_perfil, finalizar, __end__
 
-ARESTAS (49; [cond] = condicional, com o rótulo da rota):
+ARESTAS (50; [cond] = condicional, com o rótulo da rota):
   __start__ -> inicio
   avaliador -> chef  [cond: chef]
   avaliador -> finalizar  [cond: fim]
@@ -218,7 +221,8 @@ ARESTAS (49; [cond] = condicional, com o rótulo da rota):
   inicio -> carregar_perfil
   nao_agir -> finalizar
   recusar -> finalizar
-  registrar -> finalizar
+  registrar -> traduzir_receita
+  traduzir_receita -> finalizar
   triagem -> checar_pedido  [cond: recomendar]
   triagem -> consultor  [cond: pergunta]
   triagem -> extrair_itens  [cond: estoque]
@@ -230,7 +234,7 @@ ARESTAS (49; [cond] = condicional, com o rótulo da rota):
   finalizar -> __end__
 ```
 
-**Conferência.** Os 24 nós do desenho estão no código, e nenhum nó do código falta no desenho. Duas divergências aparecem, e nos dois casos vale o código:
+**Conferência.** Os 25 nós do desenho estão no código, e nenhum nó do código falta no desenho. Duas divergências aparecem, e nos dois casos vale o código:
 1. **As setas `→ finalizar [cond: fim]` não estão no desenho.** Elas existem em todo nó que pode estourar o orçamento. O desenho as resume na última linha ("em qualquer nó: ■ teto_…").
 2. **A pausa não é uma aresta.** `confirmar_estoque` não tem seta para "esperar": a pausa é um `interrupt` dentro do nó. Por isso ela só aparece no desenho, com `⏸`.
 
@@ -257,6 +261,7 @@ Declarado em [estado.py](../src/estado.py). "Reducer" vazio significa **último 
 | `rejeitadas` | list | `por_turno` | `_reprovar` | `ctx_de` (sai das buscas) | ids reprovados no turno |
 | `proposta` | dict | — | ferramentas_chef (cria), `_reprovar` (zera) | conferir, avaliador, registrar, finalizar | modelo |
 | `nutricao` | dict | — | avaliador | registrar, finalizar | TBCA (código) |
+| `traducao` | dict | — | traduzir_receita | finalizar | modelo + conferência em código ([traducao.py](../src/traducao.py)) |
 | `veredito` | dict | — | conferir_proposta, avaliador | rotas, chef | código ou modelo |
 | `rodadas` | int | — | `_reprovar` | `_reprovar` | contador |
 | `resposta_consultor` | dict | — | ferramentas_consultor, verificar_resposta | finalizar | modelo + portões |

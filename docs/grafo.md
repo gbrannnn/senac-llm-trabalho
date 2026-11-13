@@ -18,6 +18,7 @@ O desenho ASCII completo, com `[M]`/`[C]`/`⏸`, e a saída do `conferir_grafo.p
 | `conferir_proposta` | não | portão: alérgeno, restrição, ingrediente faltando |
 | `avaliador` | **sim** (+ TBCA e OMS em código) | veredito contra o objetivo |
 | `registrar` | não (só embedding) | grava o histórico, idempotente |
+| `traduzir_receita` | **sim** + código | traduz nome e ingredientes para exibir; o código confere número, unidade e ingrediente de cada linha, e a que falha fica em inglês |
 | `consultor` | **sim** | uma volta do laço do agente |
 | `ferramentas_consultor` | não | executa a ferramenta; portão de números |
 | `verificar_resposta` | **sim** + código | o trecho citado existe na fonte? |
@@ -64,7 +65,7 @@ O desenho ASCII completo, com `[M]`/`[C]`/`⏸`, e a saída do `conferir_grafo.p
 
 ## 6.4 A implementação
 
-- `StateGraph(Estado)` com 24 nós; **12** arestas condicionais, todas com mapa de destinos explícito ([grafo.py](../src/grafo.py) `construir`).
+- `StateGraph(Estado)` com 25 nós; **12** arestas condicionais, todas com mapa de destinos explícito ([grafo.py](../src/grafo.py) `construir`).
 - Paralelismo por três arestas saindo de `inicio` e junção por `add_edge([...], "triagem")`.
 - Compilado **uma vez** por processo: `obter_grafo()` com `@cache`. É o objeto que `src/main.py` executa e que `conferir_grafo.py` importa.
 

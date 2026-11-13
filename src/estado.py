@@ -58,6 +58,7 @@ CAMPOS: dict[str, Any] = {
     "rejeitadas": Annotated[list, por_turno],      # ids reprovados no turno
     "proposta": dict | None,
     "nutricao": dict | None,
+    "traducao": dict | None,                       # nome e ingredientes em PT, já conferidos em código
     "veredito": dict | None,
     "rodadas": int,
     "resposta_consultor": dict | None,

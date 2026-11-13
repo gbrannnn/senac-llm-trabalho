@@ -21,6 +21,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 
 from . import catalogo, citacao, config, db, esquemas, ferramentas, llm, memoria, nutricional, rag
+from . import traducao as traducao_mod
 from .estado import Estado, EstadoSemReducer
 from .prompts import carregar
 
@@ -70,7 +71,7 @@ def inicio(estado: Estado) -> dict:
     # Campos `por_turno` recebem None: o reducer zera o que sobrou do turno anterior.
     return {"execucao_id": uuid.uuid4().hex[:10], "inicio_ts": time.time(), "fontes": None, "escolhas": None,
             "agente_msgs": None, "recuperacoes": None, "descartes_oms": None, "uso": None, "rejeitadas": None,
-            "passos_agente": 0, "rodadas": 0, "proposta": None, "veredito": None, "nutricao": None,
+            "passos_agente": 0, "rodadas": 0, "proposta": None, "veredito": None, "nutricao": None, "traducao": None,
             "resposta_consultor": None, "disponiveis_extra": [], "itens_ditos": [], "itens_propostos": [],
             "pendentes": [], "decisao_humana": None, "efeito": None, "termino": None, "erro": None,
             "saida": None, "triagem": None, "atualizacao_perfil": None, "expira_em": None}
@@ -359,6 +360,29 @@ def registrar(estado: Estado) -> dict:
                        {"tipo": "tbca", "id": ",".join(codigos), "detalhe": "composição por 100 g"}]}
 
 
+@no
+def traduzir_receita(estado: Estado) -> dict:  # MODELO + código
+    """O acervo é em inglês. O modelo traduz nome e ingredientes SÓ para exibir; o código
+    confere cada linha (número, unidade, básico e ingrediente iguais ao original) e a que falha fica em inglês.
+    Sem orçamento ou com o modelo fora do ar, a receita sai em inglês: a recomendação já valeu."""
+    receita = rag.receitas_por_id()[estado["proposta"]["receita_id"]]
+    linhas = [i["texto"] for i in receita["ingredientes"]]
+    if estouro(estado):
+        return {"escolhas": ["receita mostrada em inglês: orçamento da execução esgotado antes da tradução"]}
+    try:
+        t, uso = llm.estruturada(carregar("sistema").texto, carregar("traduzir_receita").formatar(
+            nome=json.dumps(receita["nome"], ensure_ascii=False),
+            ingredientes="\n".join(f"{n}. {l}" for n, l in enumerate(linhas, 1))),
+            esquemas.traducao_com_linhas(len(linhas)))
+    except llm.ErroFatal:
+        return {"escolhas": ["receita mostrada em inglês: a tradução falhou"]}
+    traducao = traducao_mod.aplicar(receita["nome"], linhas, t.nome, t.ingredientes)
+    escolhas = ["nome e ingredientes traduzidos pelo modelo; alérgeno e nutrição foram calculados sobre o original"]
+    if traducao["mantidas"]:
+        escolhas.append(f"{traducao['mantidas']} linha(s) de ingrediente mantida(s) em inglês: {traducao['motivo']}")
+    return {"traducao": traducao, "uso": uso, "escolhas": escolhas}
+
+
 # --- pergunta (consultor) ------------------------------------------------------------
 
 @no
@@ -628,16 +652,20 @@ def montar_saida(estado: Estado) -> esquemas.Saida:
         receita = rag.receitas_por_id()[estado["proposta"]["receita_id"]]
         ctx = ctx_de(estado)
         nut = esquemas.Nutricao(**estado["nutricao"]) if estado.get("nutricao") else None
-        rs = esquemas.ReceitaSaida(id=receita["id"], nome=receita["nome"],
+        tr = estado.get("traducao") or {}
+        rs = esquemas.ReceitaSaida(id=receita["id"], nome=receita["nome"], nome_pt=tr.get("nome_pt"),
                                    ingredientes=[i["texto"] for i in receita["ingredientes"]],
+                                   ingredientes_pt=tr.get("ingredientes_pt"),
                                    faltando_no_estoque=sorted(set(receita["itens"]) - ctx.disponiveis), nutricao=nut)
+        nome = f"{tr['nome_pt']} ({receita['nome']})" if tr.get("nome_pt") and tr["nome_pt"] != receita["nome"] else receita["nome"]
+        ingredientes = ("\nIngredientes:\n" + "\n".join(f"  - {l}" for l in tr["ingredientes_pt"])) if tr.get("ingredientes_pt") else ""
         kcal = f" A receita inteira tem cerca de {nut.energia_kcal:.0f} kcal e {nut.proteina_g:.0f} g de proteína (TBCA)." if nut else ""
         repetida = " (Essa recomendação já estava registrada hoje.)" if efeito.get("ja_existia") else ""
         justificativa, trocada = _justificativa(estado["proposta"]["justificativa"], receita)
         if trocada:
             base["escolhas_declaradas"] = base["escolhas_declaradas"] + [trocada]
         return esquemas.Saida(**base, tipo="recomendacao", receita=rs, suficiencia="suficiente",
-                              resultado=f"Sugestão: {receita['nome']}. {justificativa}{kcal}{repetida}")
+                              resultado=f"Sugestão: {nome}. {justificativa}{kcal}{repetida}{ingredientes}")
     motivos = {"teto_rodadas": "nenhuma das propostas passou na avaliação",
                "recusa_sem_base": "não encontrei receita no acervo que sirva",
                "teto_passos": "atingi o limite de passos da busca", "laco_detectado": "a busca entrou em repetição",
@@ -734,7 +762,8 @@ def construir(reducer_fontes: bool = True) -> StateGraph:
                      ("carregar_historico", carregar_historico), ("triagem", triagem), ("recusar", recusar),
                      ("nao_agir", nao_agir), ("checar_pedido", checar_pedido), ("chef", chef),
                      ("ferramentas_chef", ferramentas_chef), ("conferir_proposta", conferir_proposta),
-                     ("avaliador", avaliador), ("registrar", registrar), ("consultor", consultor),
+                     ("avaliador", avaliador), ("registrar", registrar), ("traduzir_receita", traduzir_receita),
+                     ("consultor", consultor),
                      ("ferramentas_consultor", ferramentas_consultor), ("verificar_resposta", verificar_resposta),
                      ("extrair_itens", extrair_itens),
                      ("casar_catalogo", casar_catalogo), ("confirmar_estoque", confirmar_estoque),
@@ -757,7 +786,8 @@ def construir(reducer_fontes: bool = True) -> StateGraph:
                             {"conferir": "conferir_proposta", "chef": "chef", "fim": "finalizar"})
     g.add_conditional_edges("conferir_proposta", t(rota_conferir), {"avaliador": "avaliador", "chef": "chef", "fim": "finalizar"})
     g.add_conditional_edges("avaliador", t(rota_avaliador), {"registrar": "registrar", "chef": "chef", "fim": "finalizar"})
-    g.add_edge("registrar", "finalizar")
+    g.add_edge("registrar", "traduzir_receita")
+    g.add_edge("traduzir_receita", "finalizar")
     g.add_conditional_edges("consultor", t(rota_agente), {"ferramentas": "ferramentas_consultor", "fim": "finalizar"})
     g.add_conditional_edges("ferramentas_consultor", t(rota_ferramentas_consultor),
                             {"verificar": "verificar_resposta", "consultor": "consultor", "fim": "finalizar"})

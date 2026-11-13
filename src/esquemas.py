@@ -5,7 +5,7 @@ que a rota escolhida seja a certa — isso é medido em docs/prompts.md.
 """
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, conlist, create_model
 
 # --- saídas do modelo, etapa a etapa -------------------------------------------
 
@@ -83,10 +83,23 @@ class Nutricao(BaseModel):
     base: str = "receita inteira (o dataset não informa porções)"
 
 
-class ReceitaSaida(BaseModel):
-    id: str
+class TraducaoReceita(BaseModel):
     nome: str
     ingredientes: list[str]
+
+
+def traducao_com_linhas(n: int) -> type[BaseModel]:
+    """O schema fixa o número de linhas: a saída estruturada não deixa o modelo juntar ou pular linha."""
+    return create_model("TraducaoReceita", __base__=TraducaoReceita,
+                        ingredientes=(conlist(str, min_length=n, max_length=n), ...))
+
+
+class ReceitaSaida(BaseModel):
+    id: str
+    nome: str                      # original do acervo (inglês)
+    nome_pt: str | None = None     # tradução do modelo, só para exibir
+    ingredientes: list[str]        # original do acervo: é sobre ele que alérgeno e nutrição são calculados
+    ingredientes_pt: list[str] | None = None  # linha que mudou número ou unidade fica no original
     faltando_no_estoque: list[str] = Field(default_factory=list)
     nutricao: Nutricao | None = None
 

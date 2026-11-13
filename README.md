@@ -37,7 +37,7 @@ python -m scripts.preparar
 # 4. Usar
 python -m src.main --usuario ana "o que eu faço pra jantar?"
 
-# 5. Testes (69, sem modelo) e conferência do grafo
+# 5. Testes (81, sem modelo) e conferência do grafo
 python -m pytest
 python conferir_grafo.py
 ```
@@ -94,6 +94,18 @@ Sugestão: Stir-Fried Black Rice with Fried Egg and Roasted Broccoli. Usa arroz,
 - As calorias são da **receita inteira**, porque o acervo não informa porções.
 - `escolhas_declaradas` é o que o sistema decidiu sozinho e está avisando.
 - `fontes` é o que sustenta a resposta.
+
+**Receita em português.** O acervo é em inglês. Depois desse log, entrou o nó `traduzir_receita`: a saída mostra o nome e os ingredientes traduzidos (`nome_pt`, `ingredientes_pt`), e os originais continuam no JSON. Exemplo real:
+
+```text
+Sugestão: Bolo de chocolate (Chocolate Cake). ...
+Ingredientes:
+  - 9 onças (250 g) de chocolate amargo ou meio amargo, picado
+  - 8 colheres de sopa (120 g) de manteiga sem sal
+  - 2 tablespoons flour
+```
+
+A tradução é feita pelo modelo e **conferida linha a linha em código**: número, unidade e ingrediente precisam ser iguais aos do original. A linha que falha fica em inglês e é declarada. Acima, o modelo tinha escrito "2 colheres de **chá** de farinha", e a linha voltou ao original. Alérgeno, estoque e nutrição são sempre calculados sobre o original em inglês.
 
 ### Quando o sistema para e espera você
 
@@ -168,5 +180,5 @@ src/                 o sistema (grafo.py é o centro)
 scripts/             preparar (do zero), demonstrar (os 6 casos), experimentos (E02–E10)
 dados/               catálogo de ingredientes e corpus (receitas, OMS)
 logs/                os 6 casos demonstrados e os experimentos, um JSONL por execução
-tests/               69 testes das partes determinísticas
+tests/               81 testes das partes determinísticas
 ```
