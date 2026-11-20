@@ -3,8 +3,8 @@
 **O problema em uma frase:** decidir o que cozinhar hoje com o que já existe em casa, respeitando as alergias e o objetivo de quem vai comer, sem inventar número de nutrição.
 
 ## Integrantes
-- Daniel de Araujo Carvalho
 - Eduardo Dias Santos
+- Daniel de Araujo Carvalho
 - Gabriel Brandão Vehchani de Freitas
 - Pedro Henrique Gomes
 
