@@ -16,7 +16,7 @@
 | Versão do sistema: **1.1.0** (`VERSAO_SISTEMA`, [src/config.py:16](../src/config.py#L16)), commit `690d960`. A versão vai em todo trace (`nutri.versao_sistema`) e em toda rodada da suíte | [mudancas.md](mudancas.md) |
 | Data: 23/11/2026 | |
 | Equipe: Daniel de Araujo Carvalho, Eduardo Dias Santos, Gabriel Brandão Vehchani de Freitas, Pedro Henrique Gomes | [grupo.md](grupo.md) |
-| **Quem responde, por papel** — *proposta, a confirmar pelo grupo*: **produto**, Gabriel Brandão Vehchani de Freitas (decide a finalidade e a retomada depois de uma suspensão); **desenvolvimento**, Daniel de Araujo Carvalho (código, suíte e versões); **operação**, Eduardo Dias Santos (roda o sistema, lê os traces, **suspende o agente**, guarda a credencial de operador); **risco**, Pedro Henrique Gomes (aceita os riscos do §9 e aprova as regras procedurais, como já fez com R1 e R2) | **LACUNA (L01)** até o grupo confirmar a divisão |
+| **Quem responde, por papel** (confirmado pelo grupo em 23/11/2026): **produto**, Gabriel Brandão Vehchani de Freitas (decide a finalidade e a retomada depois de uma suspensão); **desenvolvimento**, Daniel de Araujo Carvalho (código, suíte e versões); **operação**, Eduardo Dias Santos (roda o sistema, lê os traces, **suspende o agente**, guarda a credencial de operador); **risco**, Pedro Henrique Gomes (aceita os riscos do §9 e aprova as regras procedurais, como já fez com R1 e R2) | confirmação do grupo, 23/11/2026; fecha a L01 |
 
 ## 2. Finalidade
 
@@ -48,7 +48,7 @@ O formato é o do auditor de despesas da [nota sobre governar a ação](https://
 | **Modelos** | só `nutri-qwen` (de `qwen2.5:7b-instruct`, digest `845dbda0ea48`) e `bge-m3` (`790764642607`); trocar é mudar `LLM_MODELO`/`EMBED_MODELO` e rodar a suíte | **plataforma** (o que está instalado no Ollama) | o digest servido vai em todo trace (`nutri.modelo`); **conferir o digest antes de executar** é **LACUNA (L13)** |
 | **Limiar de aprovação humana** | pausa para a própria pessoa: **toda** gravação no estoque, e **toda** remoção de alergia. Prazo de 24 h; vencido, nada é gravado. Item ambíguo não é gravado com `aprovar`, só com `editar` | **código** (`interrupt` do LangGraph, com o estado no checkpoint) | [src/grafo.py:563](../src/grafo.py#L563), [:622](../src/grafo.py#L622); [humano.md](humano.md); suíte E01, E02, E03, E05; Parte 2, caso 6 ([io.md §9](io.md#9-os-seis-casos-demonstrados)) |
 | **Falha de controle** | **fail-closed**: identidade (C1), integridade (C2), escrita no perfil (C3), suspensão (C5), recusa clínica (C6), portão de alérgeno, portão de números e de citação. **Fail-open com registro**: a tradução (falhou, a receita sai em inglês e a escolha é declarada) | **código** | [seguranca.md §3](seguranca.md#3-os-controles-implementados); `test_c1_erro_ao_conferir_nega`, `test_c5_erro_ao_ler_estado_conta_como_suspenso`, `test_c2_violacao_impede_a_execucao`; [src/grafo.py](../src/grafo.py) `traduzir_receita` |
-| **Quem pode suspender** | o **operador** (Eduardo Dias Santos, proposta do §1): `python -m src.acesso suspender "motivo"` com o token de operador. Suspenso, nada executa. A retomada é decidida pelo responsável de produto, e feita pelo operador (`retomar`). Na plataforma: parar o serviço do Ollama (`sudo systemctl stop ollama`) para o sistema inteiro | **código** (C5) + **plataforma** | [src/acesso.py:73-96](../src/acesso.py#L73-L96), [src/main.py:78](../src/main.py#L78); `test_c5_suspenso_nada_executa`, `test_c5_usuario_nao_suspende`. O **exercício de desligamento** foi feito uma vez, em 23/11/2026 (suspender → execução negada → retomar, [seguranca.md §3](seguranca.md#c5--suspensão-pelo-operador-autoridade-asi10)); um exercício periódico é **LACUNA (L16)** |
+| **Quem pode suspender** | o **operador** (Eduardo Dias Santos, §1): `python -m src.acesso suspender "motivo"` com o token de operador. Suspenso, nada executa. A retomada é decidida pelo responsável de produto, e feita pelo operador (`retomar`). Na plataforma: parar o serviço do Ollama (`sudo systemctl stop ollama`) para o sistema inteiro | **código** (C5) + **plataforma** | [src/acesso.py:73-96](../src/acesso.py#L73-L96), [src/main.py:78](../src/main.py#L78); `test_c5_suspenso_nada_executa`, `test_c5_usuario_nao_suspende`. O **exercício de desligamento** foi feito uma vez, em 23/11/2026 (suspender → execução negada → retomar, [seguranca.md §3](seguranca.md#c5--suspensão-pelo-operador-autoridade-asi10)); um exercício periódico é **LACUNA (L16)** |
 | **Revisão de autoridade** | a cada ferramenta ou permissão nova, comparar esta tabela com o código | processo | **LACUNA (L17)** |
 
 ## 4. Ferramentas e integrações
@@ -120,7 +120,7 @@ O formato é o do auditor de despesas da [nota sobre governar a ação](https://
 
 ## 9. Riscos aceitos
 
-Cada risco com a razão, o que o limita e o evento de reavaliação está em [seguranca.md §4](seguranca.md#4-os-riscos-aceitos). O aceite é do responsável de risco (Pedro Henrique Gomes, proposta do §1): até o grupo confirmar os papéis, o aceite formal é **LACUNA (L34)**.
+Cada risco com a razão, o que o limita e o evento de reavaliação está em [seguranca.md §4](seguranca.md#4-os-riscos-aceitos). O aceite é do responsável de risco, Pedro Henrique Gomes (§1). Ele ainda não registrou o aceite formal dos riscos abaixo: **LACUNA (L34)**.
 
 | ID | Risco | O que o limita hoje | Evidência |
 |---|---|---|---|
@@ -187,7 +187,7 @@ Ninguém aprova as mudanças: os commits vão direto para `main`, sem revisão �
 
 ## Lacunas
 
-As lacunas da versão 1.0.0 deste card que **fecharam**, e com o quê: L05, L06, L07, L08, L09, L11, L14, L15, L18, L25, L30 (Parte 2, ver a nota do card 1.0.0); **L13 parcial** (modelo e digest definidos; falta conferir o digest antes de executar); **L31** (execuções, resultados e modos de falha observados: as rodadas do [evals.md](evals.md)); **L32** (concordância medida: 80%, juiz não adotado; o resultado negativo é a evidência). **L33** (revisão humana dos sintéticos, feita em 23/11/2026).
+As lacunas da versão 1.0.0 deste card que **fecharam**, e com o quê: L05, L06, L07, L08, L09, L11, L14, L15, L18, L25, L30 (Parte 2, ver a nota do card 1.0.0); **L13 parcial** (modelo e digest definidos; falta conferir o digest antes de executar); **L31** (execuções, resultados e modos de falha observados: as rodadas do [evals.md](evals.md)); **L32** (concordância medida: 80%, juiz não adotado; o resultado negativo é a evidência). **L33** (revisão humana dos sintéticos, feita em 23/11/2026); **L01** (papéis confirmados pelo grupo em 23/11/2026, §1).
 
 | ID | Lacuna | Correção proposta | Prioridade |
 |---|---|---|---|
@@ -197,12 +197,11 @@ As lacunas da versão 1.0.0 deste card que **fecharam**, e com o quê: L05, L06,
 | L28 | sem alerta, sem expurgo periódico, sem *append-only* nem controle de acesso ao trace | cron com `python -m src.traces --expurgar`; alerta quando `nutri.alergeno_na_saida` ou `nutri.escrita_sem_aprovacao` for `true` ou o SLO for violado; traces num diretório só do operador | P1 |
 | L03 | recusa de prescrição por paráfrase depende do prompt | ampliar os padrões de [src/escopo.py](../src/escopo.py) a cada falso negativo achado; casos novos na suíte | P1 |
 | L13 | o digest do modelo é registrado, mas não conferido | conferir o digest servido contra o de [requirements.txt](../requirements.txt) no início da execução, como o C2 faz com os dados | P1 |
-| L01 | papéis propostos, não confirmados | o grupo confirma ou corrige o §1 | P1 |
 | L16 | o desligamento foi exercitado uma vez, sem rotina | exercício de suspensão a cada versão, registrado em [mudancas.md](mudancas.md) | P2 |
 | L12 | sem limite de uso de GPU por dia | contador de execuções por dia na tabela `controle`, com suspensão automática acima do limite | P2 |
 | L26 | histórico sem prazo final (decai, não apaga) | expurgo do histórico com mais de 90 dias | P2 |
 | L27 | checkpoint sem expurgo, e guarda a entrada não redigida | apagar o checkpoint da conversa encerrada ou expirada há mais de 7 dias | P2 |
-| L34 | riscos aceitos sem aceite formal | o responsável de risco assina o §9 | P2 |
+| L34 | riscos aceitos sem aceite formal | Pedro Henrique Gomes, responsável de risco, registra o aceite (nome e data) em cada linha do §9 | P2 |
 | L35 | mudanças sem revisão | *pull request* com revisão de outro integrante | P2 |
 | L17 | sem revisão periódica de autoridade | revisar o §3 a cada ferramenta nova | P2 |
 | L38 | a restrição só é reconhecida na grafia exata do mapa: "vegetariano" barra carne, "vegetariana" (com *a*) não barra nada, em silêncio. Nas rodadas, o extrator gravou "vegetariano" e o filtro funcionou; foi achado na revisão do R08 | normalizar gênero e número antes de consultar `RESTRICAO_PARA_ITENS` ([src/grafo.py:334](../src/grafo.py#L334)), e tratar restrição desconhecida como as alergias desconhecidas (procurar pelo nome, e declarar) | **P1** |
