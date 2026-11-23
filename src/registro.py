@@ -31,10 +31,14 @@ class Registro:
         carimbo = datetime.now().strftime("%Y%m%d-%H%M%S")
         self.caminho: Path = config.LOGS / f"{carimbo}_{nome}.jsonl"
         self.inicio = time.perf_counter()
-        self._escrever({"tipo": "cabecalho", "data": datetime.now().isoformat(timespec="seconds"), "commit": commit(),
+        # guardados também no objeto: a raiz do trace (src.main) carimba os mesmos valores
+        self.commit, self.modelo = commit(), llm.identidade_modelo()
+        self.prompts, self.indices = prompts.versoes(), rag.versoes_indice()
+        self._escrever({"tipo": "cabecalho", "data": datetime.now().isoformat(timespec="seconds"), "commit": self.commit,
+                        "versao_sistema": config.VERSAO_SISTEMA,
                         "thread_id": thread_id, "usuario_id": usuario_id, "entrada": entrada,
-                        "modelo": llm.identidade_modelo(), "parametros": {"temperature": config.TEMPERATURA, "top_p": config.TOP_P},
-                        "prompts": prompts.versoes(), "indices": rag.versoes_indice(),
+                        "modelo": self.modelo, "parametros": {"temperature": config.TEMPERATURA, "top_p": config.TOP_P},
+                        "prompts": self.prompts, "indices": self.indices,
                         "tetos": {"passos_agente": config.MAX_PASSOS_AGENTE, "rodadas": config.MAX_RODADAS_AVALIACAO,
                                   "tokens_execucao": config.MAX_TOKENS_EXECUCAO, "tokens_janela": config.MAX_TOKENS_JANELA,
                                   "tempo_s": config.TIMEOUT_EXECUCAO_S, "recursion_limit": config.RECURSION_LIMIT}})

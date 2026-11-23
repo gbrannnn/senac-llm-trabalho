@@ -20,7 +20,7 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 
-from . import catalogo, citacao, config, db, esquemas, ferramentas, llm, memoria, nutricional, rag
+from . import catalogo, citacao, config, db, esquemas, ferramentas, llm, memoria, nutricional, rag, telemetria
 from . import traducao as traducao_mod
 from .estado import Estado, EstadoSemReducer
 from .prompts import carregar
@@ -29,14 +29,38 @@ from .prompts import carregar
 
 
 def no(fn):
-    """Erro fatal (modelo fora do ar, JSON inválido duas vezes) vira término, não exceção."""
+    """Erro fatal (modelo fora do ar, JSON inválido duas vezes) vira término, não exceção.
+
+    Também marca a etapa vigente: cada span `chat` e `execute_tool` aberto dentro do nó
+    leva `nutri.etapa=<nó>`, e é assim que o trace diz QUAL etapa chamou o modelo."""
     @functools.wraps(fn)
     def envolvido(estado):
+        marca = telemetria.etapa_atual.set(fn.__name__)
         try:
             return fn(estado)
         except llm.ErroFatal as erro:
             return {"termino": "erro_fatal", "erro": str(erro)}
+        finally:
+            telemetria.etapa_atual.reset(marca)
     return envolvido
+
+
+def _executar_chamada(c: dict, executor) -> str:
+    """Uma chamada de ferramenta pedida pelo modelo, dentro de um span `execute_tool`."""
+    nome, args = c["function"]["name"], llm.argumentos(c)
+    with telemetria.ferramenta(nome, args, c.get("id")) as span:
+        resultado = executor(nome, args)
+        telemetria.resultado(span, resultado)
+    return resultado
+
+
+def _escrever(nome: str, argumentos: dict, escrita):
+    """Escrita no banco feita pelo CÓDIGO (nunca pelo modelo), também como `execute_tool`:
+    é o span que diz se o mundo mudou, e quantas vezes (avaliação de resultado)."""
+    with telemetria.ferramenta(nome, argumentos, origem="codigo", tipo="escrita") as span:
+        efeito = escrita()
+        telemetria.resultado(span, efeito)
+    return efeito
 
 
 def estouro(estado: Estado) -> str | None:
@@ -248,22 +272,22 @@ def ferramentas_chef(estado: Estado) -> dict:
     if _laco(estado):
         return {"termino": "laco_detectado"}
     ctx, novas, saida = ctx_de(estado), [], {}
-    for c in _ultimas_chamadas(estado):
-        nome, args = c["function"]["name"], llm.argumentos(c)
+
+    def executor(nome: str, args: dict) -> str:
         if nome == "propor_receita":
             receita = rag.receitas_por_id().get(args.get("receita_id", ""))
             if receita is None:
-                resultado = json.dumps({"erro": f"receita '{args.get('receita_id')}' não existe. Use um id de buscar_receitas."})
-            else:
-                saida["proposta"] = {"receita_id": receita["id"], "justificativa": args.get("justificativa", "")}
-                resultado = json.dumps({"ok": "proposta recebida para avaliação"})
-        elif nome == "declarar_sem_opcao":
+                return json.dumps({"erro": f"receita '{args.get('receita_id')}' não existe. Use um id de buscar_receitas."})
+            saida["proposta"] = {"receita_id": receita["id"], "justificativa": args.get("justificativa", "")}
+            return json.dumps({"ok": "proposta recebida para avaliação"})
+        if nome == "declarar_sem_opcao":
             saida["termino"] = "recusa_sem_base"
             saida["escolhas"] = [f"o chef não encontrou receita adequada: {args.get('motivo', '')}"]
-            resultado = json.dumps({"ok": True})
-        else:
-            resultado = ferramentas.executar(ctx, nome, args)
-        novas.append({"role": "tool", "tool_call_id": c["id"], "content": resultado})
+            return json.dumps({"ok": True})
+        return ferramentas.executar(ctx, nome, args)
+
+    for c in _ultimas_chamadas(estado):
+        novas.append({"role": "tool", "tool_call_id": c["id"], "content": _executar_chamada(c, executor)})
     return {**saida, "agente_msgs": novas, "recuperacoes": ctx.recuperacoes}
 
 
@@ -352,8 +376,9 @@ def rota_avaliador(estado: Estado) -> str:
 def registrar(estado: Estado) -> dict:
     receita = rag.receitas_por_id()[estado["proposta"]["receita_id"]]
     vetor = memoria.embedding_episodio(estado["entrada"], receita["nome"])
-    efeito = db.registrar_recomendacao(estado["usuario_id"], receita, estado["entrada"],
-                                       (estado.get("nutricao") or {}).get("energia_kcal"), vetor)
+    efeito = _escrever("registrar_recomendacao", {"receita_id": receita["id"]},
+                       lambda: db.registrar_recomendacao(estado["usuario_id"], receita, estado["entrada"],
+                                                         (estado.get("nutricao") or {}).get("energia_kcal"), vetor))
     codigos = sorted({catalogo.itens()[i]["tbca"] for i in receita["itens"] if catalogo.itens()[i]["tbca"]})
     return {"efeito": efeito, "termino": "concluido",
             "fontes": [{"tipo": "receita", "id": receita["id"], "detalhe": receita["fonte"]},
@@ -396,27 +421,28 @@ def ferramentas_consultor(estado: Estado) -> dict:
     if _laco(estado):
         return {"termino": "laco_detectado"}
     ctx, novas, saida = ctx_de(estado), [], {}
-    for c in _ultimas_chamadas(estado):
-        nome, args = c["function"]["name"], llm.argumentos(c)
-        if nome == "responder":
-            # portão de citação: todo número da resposta tem de estar no que as ferramentas devolveram
-            textos = [m["content"] for m in estado.get("agente_msgs", []) + novas if m.get("role") == "tool"]
-            textos.append(estado["entrada"])  # número que a própria pessoa disse ("30%") não é invenção
-            sem_fonte = citacao.nao_sustentados(args.get("resposta", ""), textos)
-            achou = any(r["ids"] for r in ctx.recuperacoes + estado.get("recuperacoes", []))
-            if sem_fonte:
-                saida["termino"] = "recusa_sem_base"
-                saida["escolhas"] = [f"resposta do modelo descartada: número(s) {', '.join(sorted(sem_fonte))} "
-                                     "não aparece(m) em nenhuma fonte consultada"]
-                saida["resposta_consultor"] = {**args, "descartada": True}
-            else:
-                # parcial: o modelo diz que faltou algo, mas alguma busca trouxe dado
-                saida["resposta_consultor"] = {**args, "parcial": not args.get("suficiente") and achou}
-                saida["termino"] = "concluido" if args.get("suficiente") or achou else "recusa_sem_base"
-            resultado = json.dumps({"ok": True})
+
+    def executor(nome: str, args: dict) -> str:
+        if nome != "responder":
+            return ferramentas.executar(ctx, nome, args)
+        # portão de citação: todo número da resposta tem de estar no que as ferramentas devolveram
+        textos = [m["content"] for m in estado.get("agente_msgs", []) + novas if m.get("role") == "tool"]
+        textos.append(estado["entrada"])  # número que a própria pessoa disse ("30%") não é invenção
+        sem_fonte = citacao.nao_sustentados(args.get("resposta", ""), textos)
+        achou = any(r["ids"] for r in ctx.recuperacoes + estado.get("recuperacoes", []))
+        if sem_fonte:
+            saida["termino"] = "recusa_sem_base"
+            saida["escolhas"] = [f"resposta do modelo descartada: número(s) {', '.join(sorted(sem_fonte))} "
+                                 "não aparece(m) em nenhuma fonte consultada"]
+            saida["resposta_consultor"] = {**args, "descartada": True}
         else:
-            resultado = ferramentas.executar(ctx, nome, args)
-        novas.append({"role": "tool", "tool_call_id": c["id"], "content": resultado})
+            # parcial: o modelo diz que faltou algo, mas alguma busca trouxe dado
+            saida["resposta_consultor"] = {**args, "parcial": not args.get("suficiente") and achou}
+            saida["termino"] = "concluido" if args.get("suficiente") or achou else "recusa_sem_base"
+        return json.dumps({"ok": True})
+
+    for c in _ultimas_chamadas(estado):
+        novas.append({"role": "tool", "tool_call_id": c["id"], "content": _executar_chamada(c, executor)})
     fontes = []
     for r in ctx.recuperacoes:
         tipo = "tbca" if r["indice"] == "tbca" else "oms"
@@ -542,7 +568,8 @@ def rota_confirmar(estado: Estado) -> str:
 
 @no
 def gravar_estoque(estado: Estado) -> dict:
-    efeito = db.somar_estoque(estado["usuario_id"], estado["decisao_humana"]["itens"])
+    itens = estado["decisao_humana"]["itens"]
+    efeito = _escrever("somar_estoque", {"itens": itens}, lambda: db.somar_estoque(estado["usuario_id"], itens))
     return {"efeito": efeito, "termino": "concluido",
             "fontes": [{"tipo": "usuario", "id": estado["execucao_id"], "detalhe": "aprovação humana da lista"}]}
 
@@ -585,7 +612,8 @@ def confirmar_perfil(estado: Estado) -> dict:
 @no
 def gravar_perfil(estado: Estado) -> dict:
     a = estado["atualizacao_perfil"]
-    efeito = db.atualizar_perfil(estado["usuario_id"], a["campo"], a["operacao"], a["valor"])
+    efeito = _escrever("atualizar_perfil", a,
+                       lambda: db.atualizar_perfil(estado["usuario_id"], a["campo"], a["operacao"], a["valor"]))
     return {"efeito": efeito, "termino": "concluido",
             "fontes": [{"tipo": "usuario", "id": estado["execucao_id"], "detalhe": "mensagem da pessoa"}]}
 

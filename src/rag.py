@@ -17,14 +17,17 @@ from functools import cache
 
 import numpy as np
 
-from . import config, llm
+from . import config, llm, telemetria
 
 
 def embedar(textos: list[str]) -> np.ndarray:
-    try:
-        resposta = llm.cliente().embeddings.create(model=config.EMBED_MODELO, input=textos)
-    except Exception as erro:  # rede/servidor: não há o que o modelo contorne
-        raise llm.ErroFatal(f"falha no embedding: {erro}") from erro
+    with telemetria.embeddings(config.EMBED_MODELO, len(textos)) as span:
+        try:
+            resposta = llm.cliente().embeddings.create(model=config.EMBED_MODELO, input=textos)
+        except Exception as erro:  # rede/servidor: não há o que o modelo contorne
+            raise llm.ErroFatal(f"falha no embedding: {erro}") from erro
+        if resposta.usage:
+            span.set_attribute("gen_ai.usage.input_tokens", resposta.usage.prompt_tokens)
     matriz = np.array([d.embedding for d in resposta.data], dtype=np.float32)
     return matriz / np.linalg.norm(matriz, axis=1, keepdims=True)
 

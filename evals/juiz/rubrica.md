@@ -1,20 +1,57 @@
-{"id": "J01", "usuario": "ana", "pedido": "o que eu faço pro almoço?", "receita_id": "R03115", "receita": "Stir-Fried Black Rice with Fried Egg and Roasted Broccoli", "receita_pt": "Arroz preto frito com ovo frito e brócolis assado", "ingredientes": ["2 tablespoons vegetable oil, divided", "2 large eggs", "Kosher salt", "2 cups cooked black rice (from about 1 cup uncooked)", "Coconut-Oil Roasted Broccoli with Nutritional Yeast, some Toasted Nori Mayonnaise, sliced avocado, and cilantro leaves with tender stems (for serving)"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-154806_juiz_amostra_01.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J02", "usuario": "ana", "pedido": "me sugere um lanche", "receita_id": "R08399", "receita": "Spaghetti with Braised Kale", "receita_pt": "Espaguete com couve braizada", "ingredientes": ["1 pound lacinato kale (about 2 bunches), large center ribs and stems removed, cut crosswise into 1/2-inch slices", "3 tablespoons olive oil, divided", "1 medium onion, finely chopped (about 1 1/2 cups)", "8 large garlic cloves, thinly sliced", "1/2 pound spaghetti", "2 teaspoons fresh lemon juice", "Finely grated Parmesan cheese"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-154928_juiz_amostra_02.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J03", "usuario": "ana", "pedido": "quero algo pro café da manhã", "receita_id": "R03115", "receita": "Stir-Fried Black Rice with Fried Egg and Roasted Broccoli", "receita_pt": "Arroz preto frito com ovo frito e brócolis assado", "ingredientes": ["2 tablespoons vegetable oil, divided", "2 large eggs", "Kosher salt", "2 cups cooked black rice (from about 1 cup uncooked)", "Coconut-Oil Roasted Broccoli with Nutritional Yeast, some Toasted Nori Mayonnaise, sliced avocado, and cilantro leaves with tender stems (for serving)"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-155040_juiz_amostra_03.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J04", "usuario": "ana", "pedido": "quero um jantar com espinafre", "receita_id": "R10280", "receita": "Wilted Spinach with Nutmeg Butter", "receita_pt": "Porco Espinho com Nutella", "ingredientes": ["4 pounds flat-leaf spinach (about 8 bunches), coarse stems discarded", "5 tablespoons unsalted butter", "1 1/2 teaspoons grated nutmeg"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-155202_juiz_amostra_05.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J05", "usuario": "ana", "pedido": "faz alguma coisa com batata", "receita_id": "R04272", "receita": "Extra-Buttery Mashed Spuds", "receita_pt": "Batatas assadas super manteigadas", "ingredientes": ["4 pounds Yukon Gold potatoes, peeled, cut into 2\" pieces", "1 tablespoon kosher salt", "1 1/2 cups whole milk", "3 thyme sprigs, optional", "2 bay leaves", "3/4 cup (1 1/2 sticks) unsalted butter"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-155257_juiz_amostra_06.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J06", "usuario": "ana", "pedido": "quero um molho pra acompanhar o macarrão", "receita_id": "R02475", "receita": "Kale, Tomato, and Lemon Magic One-Pot Spaghetti", "receita_pt": "Kale, Tomato e Laranja Magia na Panela Unica", "ingredientes": ["14 ounces/400 g spaghetti or linguine", "14 ounces/400 g cherry tomatoes", "Zest of 2 large unwaxed lemons", "7 tablespoons/100 ml olive oil", "2 heaping teaspoons flaky sea salt (if you are using fine-grain table salt, add a bit less)", "1 (14-ounce/400-g) bunch of kale or spinach", "Parmesan cheese (I use a vegetarian one) (optional)"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-155410_juiz_amostra_07.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J07", "usuario": "ana", "pedido": "me sugere um acompanhamento pro frango", "receita_id": "R03777", "receita": "Garlic and Herb Spatchcock Grilled Chicken", "receita_pt": "Frango grelhado com alho e ervas e peito de frango com pele e ossos", "ingredientes": ["1 bunch rosemary", "3 garlic cloves, smashed", "1/4 cup olive oil", "1 (3 1/2-pound) whole chicken", "1 (1 1/2-pound) skin-on, bone-in whole chicken breast", "2 teaspoons kosher salt", "1 teaspoon freshly ground black pepper"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-155532_juiz_amostra_08.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J08", "usuario": "ana", "pedido": "o que eu janto hoje?", "receita_id": "R03115", "receita": "Stir-Fried Black Rice with Fried Egg and Roasted Broccoli", "receita_pt": "Arroz preto frito com ovo frito e brócolis assado", "ingredientes": ["2 tablespoons vegetable oil, divided", "2 large eggs", "Kosher salt", "2 cups cooked black rice (from about 1 cup uncooked)", "Coconut-Oil Roasted Broccoli with Nutritional Yeast, some Toasted Nori Mayonnaise, sliced avocado, and cilantro leaves with tender stems (for serving)"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-155640_juiz_amostra_09.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J09", "usuario": "ana", "pedido": "quero uma massa", "receita_id": "R02475", "receita": "Kale, Tomato, and Lemon Magic One-Pot Spaghetti", "receita_pt": "Kale, Tomato e Laranja Magia na Panela Unica", "ingredientes": ["14 ounces/400 g spaghetti or linguine", "14 ounces/400 g cherry tomatoes", "Zest of 2 large unwaxed lemons", "7 tablespoons/100 ml olive oil", "2 heaping teaspoons flaky sea salt (if you are using fine-grain table salt, add a bit less)", "1 (14-ounce/400-g) bunch of kale or spinach", "Parmesan cheese (I use a vegetarian one) (optional)"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-155738_juiz_amostra_10.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J10", "usuario": "ana", "pedido": "uma sopa, por favor", "receita_id": "R01445", "receita": "Kefir-Battered Cast-Iron Fried Chicken", "receita_pt": "Frango frito com kefir", "ingredientes": ["1 1/2 cups organic plain whole-milk kefir", "1 cup kosher salt", "1 whole organic chicken (about 3 pounds)", "1 1/2 cups grapeseed oil", "1 cup panko breadcrumbs, crushed", "1/2 cup organic whole wheat flour", "1 tablespoon smoked paprika", "1 teaspoon freshly cracked black pepper", "1 teaspoon cayenne pepper", "Pinch of Maldon sea salt"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-155852_juiz_amostra_11.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J11", "usuario": "ana", "pedido": "algo com tomate e queijo", "receita_id": "R00090", "receita": "Burst Cherry Tomato Pasta", "receita_pt": "Burst Cherry Tomato Pasta", "ingredientes": ["½ cup extra-virgin olive oil, plus more for drizzling", "6 garlic cloves, smashed", "2½ lb. cherry tomatoes (about 4 pints)", "2 large sprigs basil, plus 1 cup basil leaves, torn if large", "¾ tsp. crushed red pepper flakes", "1½ tsp. kosher salt, plus more", "Pinch of sugar (optional)", "12 oz. casarecce or other medium-size pasta", "1 oz. Parmesan, finely grated (about ½ cup), plus more for serving"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-160000_juiz_amostra_12.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J12", "usuario": "ana", "pedido": "um prato com arroz", "receita_id": "R03115", "receita": "Stir-Fried Black Rice with Fried Egg and Roasted Broccoli", "receita_pt": "Arroz preto frito com ovo frito e brócolis assado", "ingredientes": ["2 tablespoons vegetable oil, divided", "2 large eggs", "Kosher salt", "2 cups cooked black rice (from about 1 cup uncooked)", "Coconut-Oil Roasted Broccoli with Nutritional Yeast, some Toasted Nori Mayonnaise, sliced avocado, and cilantro leaves with tender stems (for serving)"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-160119_juiz_amostra_13.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J13", "usuario": "ana", "pedido": "tem alguma salada que eu consiga fazer?", "receita_id": "R03895", "receita": "Snap Pea Salad", "receita_pt": "Salada de ervilha-ponto", "ingredientes": ["1 pound sugar snap peas, trimmed and strings removed (see note)", "A five-finger pinch of mint leaves (preferably black mint), roughly chopped at the last minute", "1/4 cup Simple Lemon Dressing", "Maldon or another flaky sea salt", "Lemon juice", "Large handful delicate, peppery arugula"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-160344_juiz_amostra_15.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J14", "usuario": "bruno", "pedido": "o que eu almoço hoje?", "receita_id": "R03115", "receita": "Stir-Fried Black Rice with Fried Egg and Roasted Broccoli", "receita_pt": "Arroz preto frito com ovo frito e brócolis assado", "ingredientes": ["2 tablespoons vegetable oil, divided", "2 large eggs", "Kosher salt", "2 cups cooked black rice (from about 1 cup uncooked)", "Coconut-Oil Roasted Broccoli with Nutritional Yeast, some Toasted Nori Mayonnaise, sliced avocado, and cilantro leaves with tender stems (for serving)"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-160444_juiz_amostra_16.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J15", "usuario": "bruno", "pedido": "algo com ovo pro jantar", "receita_id": "R03115", "receita": "Stir-Fried Black Rice with Fried Egg and Roasted Broccoli", "receita_pt": "Arroz preto frito com ovo frito e brócolis assado", "ingredientes": ["2 tablespoons vegetable oil, divided", "2 large eggs", "Kosher salt", "2 cups cooked black rice (from about 1 cup uncooked)", "Coconut-Oil Roasted Broccoli with Nutritional Yeast, some Toasted Nori Mayonnaise, sliced avocado, and cilantro leaves with tender stems (for serving)"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-160630_juiz_amostra_18.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J16", "usuario": "ana", "pedido": "quero um pão caseiro", "receita_id": "R11881", "receita": "Rough Puff Pastry Dough", "receita_pt": "Massa de Puff Pastry Rough", "ingredientes": ["1 1/4 cups all-purpose flour", "1/4 teaspoon salt", "1 stick (1/2 cup) plus 5 tablespoons unsalted butter, frozen", "5 to 6 tablespoons ice water"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-160757_juiz_amostra_20.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J17", "usuario": "ana", "pedido": "um petisco pra receber visita", "receita_id": "R02441", "receita": "Cacio e Pepe Chips", "receita_pt": "Cacic e Pápe de Papel Frito", "ingredientes": ["1 (8-ounce) bag kettle-cooked potato chips", "1 1/2 ounces Pecorino, finely grated (about 1 1/2 cups)", "1 tablespoon coarsely ground black pepper"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-160857_juiz_amostra_21.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J18", "usuario": "bruno", "pedido": "quero um prato com arroz e frango", "receita_id": "R03115", "receita": "Stir-Fried Black Rice with Fried Egg and Roasted Broccoli", "receita_pt": "Arroz preto frito com ovo frito e brócolis assado", "ingredientes": ["2 tablespoons vegetable oil, divided", "2 large eggs", "Kosher salt", "2 cups cooked black rice (from about 1 cup uncooked)", "Coconut-Oil Roasted Broccoli with Nutritional Yeast, some Toasted Nori Mayonnaise, sliced avocado, and cilantro leaves with tender stems (for serving)"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-160950_juiz_amostra_22.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J19", "usuario": "ana", "pedido": "uma receita com cebola e alho", "receita_id": "R13011", "receita": "Spaghetti with Garlic", "receita_pt": "Spaghetti com alho", "ingredientes": ["About 1 1/2 large heads garlic, separated into cloves (about 30)", "5 1/2 tablespoons extra-virgin olive oil", "1/4 teaspoon dried hot red pepper flakes", "1 lb spaghetti", "1 1/2 teaspoons finely grated fresh lemon zest", "1/4 teaspoon salt", "1/2 cup finely chopped fresh flat-leaf parsley", "Accompaniment: finely grated Parmigiano-Reggiano"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-161054_juiz_amostra_23.jsonl", "versao_sistema": "1.1.0"}
-{"id": "J20", "usuario": "ana", "pedido": "almoço rápido com ovo", "receita_id": "R03115", "receita": "Stir-Fried Black Rice with Fried Egg and Roasted Broccoli", "receita_pt": "Arroz preto frito com ovo frito e brócolis assado", "ingredientes": ["2 tablespoons vegetable oil, divided", "2 large eggs", "Kosher salt", "2 cups cooked black rice (from about 1 cup uncooked)", "Coconut-Oil Roasted Broccoli with Nutritional Yeast, some Toasted Nori Mayonnaise, sliced avocado, and cilantro leaves with tender stems (for serving)"], "trace": "/home/daniel/senac-llm-trabalho/logs/traces/20261123-161203_juiz_amostra_24.jsonl", "versao_sistema": "1.1.0"}
+---
+id: adequacao_receita
+versao: 1.0.0
+data: 2026-11-23
+modelo_juiz: llama3.1:8b
+limiar_declarado_em: 2026-11-23, antes de qualquer saída ser julgada ou rotulada
+---
+# Rubrica do juiz — a receita atende ao pedido?
+
+## Por que esta propriedade vai para um juiz
+
+Alergia, ingrediente faltando, restrição e números são conferidos em código (docs/evals.md §2).
+O que sobra sem gabarito é se a receita **é o que a pessoa pediu**: "o que eu almoço?" respondido
+com *Garlic Croutons* passa em todas as verificações determinísticas, porque o crouton usa o que
+está no estoque e não tem alérgeno, e mesmo assim não é almoço. Nenhuma lista de palavras separa
+"prato" de "acompanhamento" no acervo (os nomes estão em inglês e variam: *dressing*, *vinaigrette*,
+*relish*, *topping*, *sauce*...), e a regra R1 da memória procedural, que pede isso ao chef, é só
+texto no prompt.
+
+## Critério (binário)
+
+**ADEQUADA (`adequada: true`)** quando as duas condições valem:
+1. a receita é algo que se come como a refeição pedida: um prato para "jantar" ou "almoço"; para
+   "lanche" ou "café da manhã" vale também algo leve, um sanduíche ou uma panqueca; para
+   "sobremesa" ou "doce", um doce;
+2. se a pessoa citou explicitamente um ingrediente ou um tipo de prato, a receita é desse ingrediente
+   ou desse tipo de prato.
+
+**NÃO ADEQUADA (`adequada: false`)** quando ao menos uma vale:
+- a receita é um acompanhamento isolado ou um componente (molho, molho de salada, vinagrete,
+  tempero, calda, cobertura, crouton, caldo base) e a pessoa pediu uma refeição;
+- a receita é doce ou sobremesa e a pessoa pediu almoço ou jantar;
+- a receita ignora o ingrediente ou o tipo de prato que a pessoa pediu.
+
+**Não julgue:** calorias, nutrição, alergia, estoque, tempo ou porções (são conferidos em código),
+nem a qualidade do texto. Um pedido vago ("o que eu como?") aceita qualquer prato.
+
+## Exemplos
+
+- **ADEQUADA.** Pedido: "oi! o que eu posso fazer pra jantar hoje?". Receita: *Lemony Chicken Milanese
+  with Arugula Salad* (frango, limão, ovo, folhas). É um prato de jantar.
+- **NÃO ADEQUADA.** Pedido: "to com fome, o que eu almoço?". Receita: *Garlic Croutons* (pão, alho,
+  manteiga). Crouton é acompanhamento, não almoço.
+
+## Saída
+
+`{"adequada": true | false, "motivo": "uma frase"}`
+
+## Limiar de adoção (declarado antes de medir)
+
+O juiz é adotado na suíte só se, nas 20 saídas rotuladas à mão:
+- **concordância ≥ 85%** (17 de 20), **e**
+- **no máximo 1 falso positivo** (juiz diz adequada, humano diz não). O falso positivo é o erro que
+  importa: é o juiz deixando passar o crouton como almoço.
+
+Abaixo do limiar, o juiz **não é adotado**: os vereditos continuam sendo registrados nas rodadas,
+mas não entram no "passou" de nenhum caso, e o resultado negativo é reportado em docs/evals.md.

@@ -17,7 +17,7 @@ import requests
 from openai import APIConnectionError, APIStatusError, OpenAI
 from pydantic import BaseModel, ValidationError
 
-from . import config
+from . import config, telemetria
 
 
 class ErroFatal(Exception):
@@ -45,11 +45,24 @@ def identidade_modelo() -> dict:
 
 
 def _criar(**kwargs):
-    try:
-        return cliente().chat.completions.create(
-            model=config.LLM_MODELO, temperature=config.TEMPERATURA, top_p=config.TOP_P, **kwargs)
-    except (APIConnectionError, APIStatusError) as erro:
-        raise ErroFatal(f"falha ao chamar o modelo: {erro}") from erro
+    """Toda chamada ao modelo passa aqui, e cada uma vira um span `chat` (src.telemetria)."""
+    atributos = {"gen_ai.request.temperature": config.TEMPERATURA, "gen_ai.request.top_p": config.TOP_P,
+                 "nutri.chamada.ferramentas_ofertadas": len(kwargs.get("tools") or []),
+                 "nutri.chamada.saida_estruturada": (kwargs.get("response_format") or {}).get("json_schema", {}).get("name")}
+    with telemetria.chat(config.LLM_MODELO, atributos) as span:
+        try:
+            resposta = cliente().chat.completions.create(
+                model=config.LLM_MODELO, temperature=config.TEMPERATURA, top_p=config.TOP_P, **kwargs)
+        except (APIConnectionError, APIStatusError) as erro:
+            raise ErroFatal(f"falha ao chamar o modelo: {erro}") from erro
+        uso = resposta.usage
+        telemetria.definir(span, {
+            "gen_ai.response.model": resposta.model, "gen_ai.response.id": resposta.id,
+            "gen_ai.usage.input_tokens": uso.prompt_tokens if uso else None,
+            "gen_ai.usage.output_tokens": uso.completion_tokens if uso else None,
+            "gen_ai.response.finish_reasons": [c.finish_reason or "?" for c in resposta.choices],
+            "nutri.chamada.pediu_ferramentas": [t.function.name for t in (resposta.choices[0].message.tool_calls or [])]})
+        return resposta
 
 
 def estruturada(sistema: str, usuario: str, esquema: type[BaseModel]) -> tuple[BaseModel, dict]:

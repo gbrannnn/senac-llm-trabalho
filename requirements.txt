@@ -9,5 +9,9 @@ numpy==2.5.4
 python-dotenv==1.2.4
 requests==2.34.2
 pytest==9.1.1
+# Traces nas convenções GenAI (docs/observabilidade.md §2). Exportados para arquivo: nenhum serviço a subir.
+opentelemetry-api==1.45.2
+opentelemetry-sdk==1.45.2
+opentelemetry-semantic-conventions==0.66b2
 # Modelos (fora do pip, no Ollama 0.40.6): qwen2.5:7b-instruct digest 845dbda0ea48 + Modelfile -> nutri-qwen;
 # bge-m3 digest 790764642607 (embedding, 1024 dimensões).

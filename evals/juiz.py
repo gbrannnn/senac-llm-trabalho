@@ -81,25 +81,16 @@ PEDIDOS = [
     ("bruno", "um lanche pós-treino"), ("bruno", "algo com ovo pro jantar"), ("bruno", "me sugere uma receita com limão"),
     ("ana", "quero um pão caseiro"), ("ana", "um petisco pra receber visita"), ("bruno", "quero um prato com arroz e frango"),
     ("ana", "uma receita com cebola e alho"), ("ana", "almoço rápido com ovo"),
-    # acrescentados depois da primeira passada, para completar 20 saídas com receita (--a-partir 25)
-    ("ana", "o que eu posso fazer com frango e limão?"), ("ana", "quero uma janta com macarrão"),
-    ("ana", "me sugere algo com batata e queijo"), ("ana", "uma receita com tomate"), ("ana", "quero um prato com espinafre e ovo"),
-    ("ana", "o que dá pra fazer com pão?"), ("ana", "um jantar com cebola"), ("ana", "algo com arroz e ovo pro almoço"),
 ]
 N_AMOSTRA = 20
 
 
-def amostrar(a_partir: int = 1) -> None:
-    """Roda PEDIDOS a partir do n-ésimo (1 = do começo) até juntar N_AMOSTRA saídas com receita.
-    Com a_partir > 1, acrescenta à amostra existente: completar não reroda o que já rodou."""
+def amostrar() -> None:
     from scripts import preparar
 
     from .rodar import rodar_passo
-    linhas = [json.loads(l) for l in AMOSTRA.read_text(encoding="utf-8").splitlines() if l.strip()] \
-        if a_partir > 1 and AMOSTRA.exists() else []
+    linhas = []
     for n, (usuario, pedido) in enumerate(PEDIDOS, 1):
-        if n < a_partir:
-            continue
         if len(linhas) >= N_AMOSTRA:
             break
         preparar.semear()
@@ -169,38 +160,6 @@ def validar() -> None:
   -> {'ADOTADO' if resultado['adotado'] else 'NÃO ADOTADO'}; {len(desacordos)} desacordo(s) a ler, em {VALIDACAO.name}""")
 
 
-def julgar_rodada(pasta: str) -> None:
-    """Julga as recomendações de uma rodada já gravada (a rodada roda com --sem-juiz quando
-    o modelo do juiz não cabe junto na memória). Só altera o 'passou' se o juiz estiver adotado."""
-    from .rodar import carregar_dataset, placar
-    p = Path(pasta)
-    casos = [json.loads(l) for l in (p / "casos.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
-    meta = json.loads((p / "rodada.json").read_text(encoding="utf-8"))
-    por_id = {c["id"]: c for c in carregar_dataset()["casos"]}
-    meta["juiz_adotado"], meta["rubrica_juiz"], meta["modelo_juiz"] = adotado(), rubrica()["versao"], MODELO
-    for r in casos:
-        caso = por_id[r["id"]]
-        if not (caso["esperado"].get("juiz") and r["saida"].get("receita")):
-            continue
-        pedido = next(x["texto"] for x in reversed(caso["passos"]) if "texto" in x)
-        r["juiz"] = julgar_saida(pedido, r["saida"])
-        print(f"{r['id']:4s} {'adequada' if r['juiz']['adequada'] else 'NÃO adequada'} — {r['juiz']['motivo']}", flush=True)
-        r["verificacoes"] = [v for v in r["verificacoes"] if v["nivel"] != "juiz"]
-        if meta["juiz_adotado"]:
-            r["verificacoes"].append({"nivel": "juiz", "verificacao": "adequacao_receita", "passou": r["juiz"]["adequada"],
-                                      "detalhe": r["juiz"]["motivo"]})
-        r["passou"] = all(v["passou"] for v in r["verificacoes"])
-    (p / "casos.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False, default=str) + "\n" for r in casos), encoding="utf-8")
-    meta["placar"] = placar(casos)
-    (p / "rodada.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
-
-
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
-    comandos = {"amostrar": amostrar, "validar": validar}
-    if sys.argv[1] == "rodada":
-        julgar_rodada(sys.argv[2])
-    elif sys.argv[1] == "amostrar" and "--a-partir" in sys.argv:
-        amostrar(int(sys.argv[sys.argv.index("--a-partir") + 1]))
-    else:
-        comandos[sys.argv[1]]()
+    {"amostrar": amostrar, "validar": validar}[sys.argv[1]]()

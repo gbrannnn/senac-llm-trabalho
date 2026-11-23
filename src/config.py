@@ -11,6 +11,10 @@ from dotenv import load_dotenv
 RAIZ = Path(__file__).resolve().parent.parent
 load_dotenv(RAIZ / ".env")
 
+# Versão do SISTEMA (código + prompts + dados), carimbada em todo trace e em toda rodada
+# da suíte. Muda a cada mudança de comportamento; o histórico está em docs/mudancas.md.
+VERSAO_SISTEMA = "1.0.0"
+
 DADOS = RAIZ / "dados"
 LOGS = RAIZ / "logs"
 PROMPTS = Path(__file__).resolve().parent / "prompts"
@@ -36,7 +40,9 @@ MAX_RODADAS_AVALIACAO = 3      # vezes que uma proposta pode ser reprovada
 # A v1 dizia "6000 tokens por pedido" sem dizer se era janela ou execução. Agora são dois:
 MAX_TOKENS_JANELA = 6000       # prompt de UMA chamada (num_ctx=8192 no Modelfile deixa folga)
 MAX_TOKENS_EXECUCAO = 40000    # soma de todas as chamadas do turno
-TIMEOUT_EXECUCAO_S = 120       # parede: modelo local é mais lento que o declarado na v1
+# parede: modelo local é mais lento que o declarado na v1. O padrão é o do sistema (120 s, medido
+# numa GPU de 8 GB). A suíte da Parte 3 rodou numa GTX 1650 de 4 GB com 600 s, declarado em docs/evals.md §4.
+TIMEOUT_EXECUCAO_S = int(os.getenv("TIMEOUT_EXECUCAO_S") or 120)
 RECURSION_LIMIT = 40           # declarado: o padrão do LangGraph 1.2.16 é 10007 (era 25 nas 0.x) e muda por env var — docs/grafo.md §6.6
 K_RECEITAS = 5
 K_OMS = 3
