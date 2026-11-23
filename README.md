@@ -8,7 +8,7 @@
 - Gabriel Brandão Vehchani de Freitas
 - Pedro Henrique Gomes
 
-**Entrega atual:** Parte 2 — o agente em LangGraph, com RAG, memória e human-in-the-loop. A documentação completa está em [docs/](docs/); comece por [docs/case.md](docs/case.md) e [docs/arquitetura.md](docs/arquitetura.md).
+**Entrega atual:** Parte 3 — o sistema sob controle: [avaliação](docs/evals.md), [governança](docs/model-card.md), [segurança](docs/seguranca.md), [observabilidade](docs/observabilidade.md) e o [histórico de mudanças](docs/mudancas.md). Sistema na versão **1.1.0**. A documentação das Partes 1 e 2 continua em [docs/](docs/); comece por [docs/case.md](docs/case.md) e [docs/arquitetura.md](docs/arquitetura.md).
 
 ---
 
@@ -31,18 +31,30 @@ python -m venv .venv
 pip install -r requirements.txt
 # opcional: copie .env.example para .env (sem .env, valem os padrões de src/config.py)
 
-# 3. Dados, índice e banco com usuários fictícios (~1 min: baixa receitas, TBCA e OMS e indexa)
+# 3. Dados, índice e banco com usuários fictícios (~1 min: baixa receitas, TBCA e OMS, confere
+#    cada arquivo contra dados/manifesto.json, indexa, e emite um token para cada usuário)
 python -m scripts.preparar
 
-# 4. Usar
+# 4. Usar: a CLI só executa com o token de quem está em --usuario (v1.1.0)
+export NUTRI_TOKEN=$(python -m src.acesso token ana)      # Windows: set NUTRI_TOKEN=... (o valor impresso)
 python -m src.main --usuario ana "o que eu faço pra jantar?"
 
-# 5. Testes (81, sem modelo) e conferência do grafo
+# 5. Testes (130, sem modelo), entre eles os dos controles de segurança, e conferência do grafo
 python -m pytest
+python -m pytest tests/test_controles.py -v               # só os controles (docs/seguranca.md §3)
 python conferir_grafo.py
 ```
 
 A TBCA não permite reprodução, então `dados/tbca.json` não está no git: o `preparar` baixa o arquivo em cada máquina. Nenhuma chave de API é necessária, porque o modelo roda local.
+
+**Os tokens.** O `preparar` grava um token por usuário fictício, e um do operador, em `dados/tokens_locais.json` (fora do git); o banco guarda só o hash. `python -m src.acesso token <usuario>` imprime o token local. Sem `NUTRI_TOKEN`, ou com o token de outra pessoa, a execução termina em `acesso_negado` e nada roda ([docs/seguranca.md §3, C1](docs/seguranca.md#c1--identidade-por-token-asi03)).
+
+**GPU de 4 GB.** Numa GPU menor que 8 GB, o modelo de chat divide a GPU com a CPU, e o Ollama passa a descarregar o modelo a cada embedding. Prenda o embedding na CPU e dê mais tempo à execução (foi assim que a suíte rodou, [docs/mudancas.md](docs/mudancas.md)):
+
+```bash
+printf 'FROM bge-m3\nPARAMETER num_gpu 0\n' > /tmp/Modelfile.bge && ollama create bge-m3-cpu -f /tmp/Modelfile.bge
+export EMBED_MODELO=bge-m3-cpu TIMEOUT_EXECUCAO_S=600
+```
 
 ## Como usar
 
@@ -87,7 +99,29 @@ Sugestão: Stir-Fried Black Rice with Fried Egg and Roasted Broccoli. Usa arroz,
 ```
 *(campos `ingredientes`, `detalhe` e `uso` omitidos aqui; estão completos em [docs/io.md](docs/io.md))*
 
-> **Sobre os hashes nos logs:** os logs em `logs/` e as evidências em `docs/evidencias/` registram o commit `d16e6b7`. Esse é o mesmo código do commit `fffe38f` (a árvore é idêntica): só a mensagem do commit foi reescrita antes do envio.
+> **Sobre os hashes nos logs:** os logs da Parte 2 em `logs/` e as evidências em `docs/evidencias/` registram o commit `d16e6b7`. Esse é o mesmo código do commit `fffe38f` (a árvore é idêntica): só a mensagem do commit foi reescrita antes do envio.
+
+**A mesma pergunta na versão 1.1.0**, copiada da rodada B da suíte (caso R01, 23/11/2026, commit `690d960`; [o trace](logs/traces/20261123-152355_eval_20261123-1523_R01_1.jsonl), e a saída completa em [evals/resultados/v1.1.0_20261123-1523/casos.jsonl](evals/resultados/v1.1.0_20261123-1523/casos.jsonl)). Com o histórico vazio da rodada, o chef escolheu outra receita; e a justificativa do modelo prometia "manutenção do peso", então o código a trocou e declarou a troca:
+
+```text
+$ export NUTRI_TOKEN=$(python -m src.acesso token ana)
+$ python -m src.main --usuario ana "oi! o que eu posso fazer pra jantar hoje?"
+Sugestão: Frango milanesa com salada de rúcula com limão (Lemony Chicken Milanese with Arugula Salad). Usa ervas frescas,
+folhas verdes, frango, limão, ovo, pão, que estão no seu estoque. A receita inteira tem cerca de 1609 kcal e 186 g de proteína (TBCA).
+Ingredientes:
+  - 4 peitos de frango sem pele e esqueleto
+  - 2 ovos grandes
+  - 1 1/4 cups panko (Japanese breadcrumbs)
+  ...
+```
+```json
+  "escolhas_declaradas": [
+    "nome e ingredientes traduzidos pelo modelo; alérgeno e nutrição foram calculados sobre o original",
+    "2 linha(s) de ingrediente mantida(s) em inglês: o ingrediente 'pão' não aparece na tradução; unidade diferente do original",
+    "justificativa do modelo substituída por texto em código: prometia benefício ('manutenção do peso')"
+  ],
+  "termino": "concluido"
+```
 
 **Como interpretar:**
 - `faltando_no_estoque` vazio: dá para fazer agora. O brócolis do nome é acompanhamento opcional, "(for serving)".
@@ -165,6 +199,53 @@ Toda resposta de nutrição passa por dois controles em código: **todo número 
 
 ---
 
+## A suíte de avaliação (Parte 3)
+
+```bash
+# roda os 35 casos de evals/dataset.json pela CLI acima, um processo por passo, e grava
+# evals/resultados/v<versão>_<data>/ (rodada.json, casos.jsonl e os traces de cada passo)
+python -m evals.rodar --versao 1.1.0          # --versao tem de ser a de src/config.py
+
+# compara duas rodadas, classe a classe, e lista os casos que mudaram de lado
+python -m evals.comparar evals/resultados/<rodada-A> evals/resultados/<rodada-B>
+
+# latência p50/p95, custo, términos, erro por ferramenta e o SLO, por versão, a partir dos traces
+python -m evals.metricas evals/resultados/<rodada-A> evals/resultados/<rodada-B>
+
+# o juiz LLM: gera as 20 saídas a rotular, valida contra os rótulos humanos, julga uma rodada
+python -m evals.juiz amostrar
+python -m evals.juiz validar
+python -m evals.juiz rodada evals/resultados/<rodada>
+```
+
+Uma rodada leva ~30 min numa GTX 1650 (a suíte precisa do Ollama no ar). Os resultados das rodadas da entrega estão commitados em [evals/resultados/](evals/resultados/), e a leitura deles em [docs/evals.md](docs/evals.md).
+
+## Os traces
+
+Cada execução grava um trace OpenTelemetry (convenções GenAI: `invoke_agent` → `chat` / `embeddings` / `execute_tool`) em `logs/traces/<data>_<nome>.jsonl`. A CLI imprime o arquivo e o começo do `trace_id` no fim de cada execução.
+
+```bash
+python -m src.traces --lista            # as últimas 20 execuções: trace_id, arquivo, término
+python -m src.traces                    # a árvore de spans da execução mais recente
+python -m src.traces 3f2a9c1e --raiz    # pelo trace_id, com o registro da decisão (todos os atributos da raiz)
+python -m src.traces --expurgar         # apaga traces e logs com mais de 90 dias
+```
+
+O que cada atributo significa: [docs/observabilidade.md §2](docs/observabilidade.md#2-o-trace-de-uma-execução).
+
+## Suspender o agente
+
+```bash
+export NUTRI_TOKEN=$(python -m src.acesso token operador)
+python -m src.acesso suspender "motivo"     # toda execução seguinte termina em `suspenso`
+python -m src.acesso retomar
+python -m src.acesso estado
+```
+
+Só o operador suspende e retoma; quem pode, e quando, está no [model card §3](docs/model-card.md#3-autoridade).
+
+---
+
 ## Estrutura
 
 ```text
@@ -173,12 +254,16 @@ requirements.txt     dependências fixadas (inclusive LangGraph)
 .env.example         nomes das variáveis, sem valores
 Modelfile            o modelo nutri-qwen (num_ctx 8192)
 conferir_grafo.py    imprime nós e arestas do grafo que o sistema executa
-docs/                case, modelos, prompts, arquitetura, rag, memoria, grafo, humano, io, fontes, model-card
+docs/                case, modelos, prompts, arquitetura, rag, memoria, grafo, humano, io, fontes,
+                     e na Parte 3: mudancas, evals, model-card, seguranca, observabilidade
   evidencias/        E01–E10: saídas de comando dos experimentos
-src/                 o sistema (grafo.py é o centro)
+src/                 o sistema (grafo.py é o centro; acesso, integridade, validacao, escopo = os controles)
   prompts/           os prompts, versionados
+evals/               dataset, verificações, rodar, comparar, métricas, juiz
+  juiz/              rubrica, amostra, rótulos humanos, validação
+  resultados/        uma pasta por rodada, commitada: a evidência dos números
 scripts/             preparar (do zero), demonstrar (os 6 casos), experimentos (E02–E10)
-dados/               catálogo de ingredientes e corpus (receitas, OMS)
-logs/                os 6 casos demonstrados e os experimentos, um JSONL por execução
-tests/               81 testes das partes determinísticas
+dados/               catálogo de ingredientes, corpus (receitas, OMS) e manifesto.json (os hashes esperados)
+logs/                um JSONL por execução; traces/ tem o trace OpenTelemetry de cada uma
+tests/               130 testes das partes determinísticas, entre eles os dos controles
 ```

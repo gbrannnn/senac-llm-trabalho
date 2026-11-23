@@ -81,16 +81,25 @@ PEDIDOS = [
     ("bruno", "um lanche pós-treino"), ("bruno", "algo com ovo pro jantar"), ("bruno", "me sugere uma receita com limão"),
     ("ana", "quero um pão caseiro"), ("ana", "um petisco pra receber visita"), ("bruno", "quero um prato com arroz e frango"),
     ("ana", "uma receita com cebola e alho"), ("ana", "almoço rápido com ovo"),
+    # acrescentados depois da primeira passada, para completar 20 saídas com receita (--a-partir 25)
+    ("ana", "o que eu posso fazer com frango e limão?"), ("ana", "quero uma janta com macarrão"),
+    ("ana", "me sugere algo com batata e queijo"), ("ana", "uma receita com tomate"), ("ana", "quero um prato com espinafre e ovo"),
+    ("ana", "o que dá pra fazer com pão?"), ("ana", "um jantar com cebola"), ("ana", "algo com arroz e ovo pro almoço"),
 ]
 N_AMOSTRA = 20
 
 
-def amostrar() -> None:
+def amostrar(a_partir: int = 1) -> None:
+    """Roda PEDIDOS a partir do n-ésimo (1 = do começo) até juntar N_AMOSTRA saídas com receita.
+    Com a_partir > 1, acrescenta à amostra existente: completar não reroda o que já rodou."""
     from scripts import preparar
 
     from .rodar import rodar_passo
-    linhas = []
+    linhas = [json.loads(l) for l in AMOSTRA.read_text(encoding="utf-8").splitlines() if l.strip()] \
+        if a_partir > 1 and AMOSTRA.exists() else []
     for n, (usuario, pedido) in enumerate(PEDIDOS, 1):
+        if n < a_partir:
+            continue
         if len(linhas) >= N_AMOSTRA:
             break
         preparar.semear()
@@ -191,5 +200,7 @@ if __name__ == "__main__":
     comandos = {"amostrar": amostrar, "validar": validar}
     if sys.argv[1] == "rodada":
         julgar_rodada(sys.argv[2])
+    elif sys.argv[1] == "amostrar" and "--a-partir" in sys.argv:
+        amostrar(int(sys.argv[sys.argv.index("--a-partir") + 1]))
     else:
         comandos[sys.argv[1]]()

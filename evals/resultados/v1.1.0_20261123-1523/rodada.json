@@ -1,0 +1,82 @@
+{
+ "versao_sistema": "1.1.0",
+ "commit": "690d960",
+ "dataset": "1.0.0",
+ "inicio": "2026-11-23T15:23:54",
+ "rubrica_juiz": "1.0.0",
+ "modelo_juiz": "llama3.1:8b",
+ "modelo": {
+  "modelo": "nutri-qwen",
+  "digest": "90eb002e84db",
+  "embedding": "bge-m3-cpu",
+  "digest_embedding": "8c442eb0c61f"
+ },
+ "parcial": false,
+ "ambiente": {
+  "TIMEOUT_EXECUCAO_S": 600,
+  "EMBED_MODELO": "bge-m3-cpu",
+  "LLM_MODELO": "nutri-qwen",
+  "python": "3.12.3"
+ },
+ "juiz_adotado": false,
+ "fim": "2026-11-23T15:47:42",
+ "placar": {
+  "classes": {
+   "escrita": {
+    "casos": 6,
+    "passaram": 6,
+    "taxa": 1.0
+   },
+   "pergunta": {
+    "casos": 8,
+    "passaram": 7,
+    "taxa": 0.875
+   },
+   "recomendacao": {
+    "casos": 8,
+    "passaram": 8,
+    "taxa": 1.0
+   },
+   "recusa": {
+    "casos": 7,
+    "passaram": 7,
+    "taxa": 1.0
+   },
+   "seguranca": {
+    "casos": 6,
+    "passaram": 5,
+    "taxa": 0.8333
+   }
+  },
+  "media_por_classe": 0.9417,
+  "casos_passaram": 33,
+  "casos": 35,
+  "verificacoes_por_nivel": {
+   "deterministico": {
+    "total": 71,
+    "passaram": 69
+   },
+   "trajetoria": {
+    "total": 14,
+    "passaram": 14
+   },
+   "resultado": {
+    "total": 64,
+    "passaram": 64
+   }
+  },
+  "juiz_adequacao": {
+   "julgados": 4,
+   "adequadas": 2
+  },
+  "terminos": {
+   "concluido": 16,
+   "recusa_sem_base": 6,
+   "pergunta_ao_usuario": 1,
+   "sem_acao": 2,
+   "rejeitado_pelo_humano": 2,
+   "recusa_fora_escopo": 7,
+   "acesso_negado": 1
+  }
+ }
+}

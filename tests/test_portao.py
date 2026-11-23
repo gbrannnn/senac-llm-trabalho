@@ -91,3 +91,23 @@ def test_pessoas_e_tempo_saem_do_texto_quando_o_modelo_deixa_nulo():
 def test_rapida_e_promessa_nao_verificavel():
     novo, motivo = grafo._justificativa("Ela é rápida e usa o que você tem.", receita_com("frango"))
     assert motivo is not None and "rápid" not in novo
+
+
+def test_limite_por_execucao_tempo_e_tokens():
+    """A autoridade 'limite por execução' (model card §3) é aplicada em código, não pelo framework."""
+    from src import config
+    agora = time.time()
+    assert grafo.estouro({"inicio_ts": agora, "uso": {"tokens": 10}}) is None
+    assert grafo.estouro({"inicio_ts": agora - config.TIMEOUT_EXECUCAO_S - 1, "uso": {}}) == "teto_tempo"
+    assert grafo.estouro({"inicio_ts": agora, "uso": {"tokens": config.MAX_TOKENS_EXECUCAO + 1}}) == "teto_tokens"
+    assert grafo.estouro({"inicio_ts": agora, "uso": {"maior_janela": config.MAX_TOKENS_JANELA + 1}}) == "teto_tokens"
+
+
+def test_teto_de_passos_do_agente_encerra_sem_chamar_o_modelo(monkeypatch):
+    from src import config, llm
+
+    def proibido(*a, **k):
+        raise AssertionError("chamou o modelo depois do teto")
+    monkeypatch.setattr(llm, "com_ferramentas", proibido)
+    e = {"inicio_ts": time.time(), "uso": {}, "passos_agente": config.MAX_PASSOS_AGENTE, "agente_msgs": []}
+    assert grafo._passo_agente(e, "p", [], None, None) == {"termino": "teto_passos"}

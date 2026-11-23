@@ -75,6 +75,39 @@ def resumo(execucoes: list[list[dict]]) -> dict:
     ruins = sum(terminos[t] for t in TERMINO_RUIM)
     n = len(raizes)
     sli = (n - ruins) / n if n else float("nan")
+    # --- as quatro perguntas do plano (docs/observabilidade.md §1) ---------------------------
+    refeicao = [r for r in raizes if r["attributes"].get("nutri.rota") == "recomendar"]
+    com_receita = [r for r in refeicao if r["attributes"].get("nutri.saida.receita_id")]
+    resolvidas = [i for i, r in enumerate(raizes) if r["attributes"].get("nutri.termino") == "concluido"]
+    por_etapa: dict[str, list[float]] = defaultdict(lambda: [0, 0.0])
+    for c in chats:
+        for s in c:
+            e = por_etapa[s["attributes"].get("nutri.etapa") or "?"]
+            e[0] += s["attributes"].get("gen_ai.usage.input_tokens", 0) + s["attributes"].get("gen_ai.usage.output_tokens", 0)
+            e[1] += duracao(s)
+    total_tok = sum(v[0] for v in por_etapa.values()) or 1
+    sinal = lambda chave: [r["attributes"][chave] for r in raizes if chave in r["attributes"]]
+    lat_teto = sum(x > TETO_DECLARADO_S for x in lat)
+    perguntas = {
+        "negocio": {"pedidos_de_refeicao": len(refeicao), "com_receita": len(com_receita),
+                    "fracao": round(len(com_receita) / len(refeicao), 3) if refeicao else None,
+                    "terminos_sem_receita": dict(Counter(r["attributes"].get("nutri.termino") for r in refeicao
+                                                          if not r["attributes"].get("nutri.saida.receita_id")))},
+        "operacao": {"teto_laco_erro": ruins, "por_etapa_onde_parou": dict(Counter(
+            max((s for s in e if s["parent_id"] is not None), key=lambda s: s["end_time"], default={"attributes": {}})
+            ["attributes"].get("nutri.etapa") for e, r in zip(execucoes, raizes)
+            if r["attributes"].get("nutri.termino") in TERMINO_RUIM))},
+        "quem_paga": {"resolvidas": len(resolvidas),
+                      "tokens_por_resolvida": round(sum(tokens) / len(resolvidas)) if resolvidas else None,
+                      "segundos_modelo_por_resolvida": round(sum(seg_modelo) / len(resolvidas), 1) if resolvidas else None,
+                      "parte_por_etapa": {k: {"tokens": int(v[0]), "fracao_tokens": round(v[0] / total_tok, 3),
+                                              "segundos": round(v[1], 1)}
+                                          for k, v in sorted(por_etapa.items(), key=lambda x: -x[1][0])}},
+        "quem_responde": {"alergeno_na_saida": {"verificadas": len(sinal("nutri.alergeno_na_saida")),
+                                                "true": sum(sinal("nutri.alergeno_na_saida"))},
+                          "escrita_sem_aprovacao": {"verificadas": len(sinal("nutri.escrita_sem_aprovacao")),
+                                                    "true": sum(sinal("nutri.escrita_sem_aprovacao"))}},
+    }
     orcamento = 1 - SLO_OBJETIVO
     datas = sorted(r["start_time"] for r in raizes)
     return {
@@ -94,7 +127,11 @@ def resumo(execucoes: list[list[dict]]) -> dict:
                 "ruins_por_motivo": {t: terminos[t] for t in TERMINO_RUIM if terminos[t]},
                 "orcamento_erro_execucoes": round(orcamento * n, 1),
                 "orcamento_consumido": round(ruins / (orcamento * n), 3) if n else None,
-                "violado": sli < SLO_OBJETIVO},
+                "violado": sli < SLO_OBJETIVO,
+                # o que o SLI seria com o teto do sistema (120 s), e não o das rodadas: LIMITE SUPERIOR de
+                # ruins, porque o teto é conferido na entrada de cada nó, e não no relógio de parede
+                f"sli_se_teto_{TETO_DECLARADO_S}s": round((n - ruins - lat_teto) / n, 4) if n else None},
+        "perguntas": perguntas,
     }
 
 
