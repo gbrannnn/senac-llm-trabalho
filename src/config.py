@@ -13,7 +13,7 @@ load_dotenv(RAIZ / ".env")
 
 # Versão do SISTEMA (código + prompts + dados), carimbada em todo trace e em toda rodada
 # da suíte. Muda a cada mudança de comportamento; o histórico está em docs/mudancas.md.
-VERSAO_SISTEMA = "1.0.0"
+VERSAO_SISTEMA = "1.1.0"
 
 DADOS = RAIZ / "dados"
 LOGS = RAIZ / "logs"

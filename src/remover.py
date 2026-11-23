@@ -25,7 +25,7 @@ from datetime import datetime
 
 from . import config, db
 
-TABELAS = ("perfil", "estoque", "historico", "escritas")
+TABELAS = ("perfil", "estoque", "historico", "escritas", "credenciais")  # credenciais: v1.1.0 (src/acesso.py)
 
 
 def _compactar(arquivo) -> None:

@@ -13,7 +13,7 @@ import json
 import sys
 
 from scripts import baixar_dados
-from src import config, db, rag
+from src import acesso, config, db, integridade, rag
 
 USUARIOS = {
     "ana": {"perfil": {"nome": "Ana (fictícia)", "objetivo": "manutenção do peso", "alergias": [],
@@ -44,7 +44,10 @@ def semear() -> None:
                              for c in db.CAMPOS_LISTA), db.agora()))
             for item_id, qtd, unidade in u["estoque"]:
                 con.execute("INSERT INTO estoque VALUES (?, ?, ?, ?, ?)", (usuario_id, item_id, qtd, unidade, db.agora()))
-    print(f"banco: {len(USUARIOS)} usuários fictícios -> {config.DB_DOMINIO}")
+    # C1 (src/acesso.py): um token por usuário fictício e um do operador. O banco guarda só o hash;
+    # o token em claro vai para dados/tokens_locais.json (fora do git), que simula a custódia de cada pessoa.
+    acesso.semear_tokens(list(USUARIOS))
+    print(f"banco: {len(USUARIOS)} usuários fictícios -> {config.DB_DOMINIO}; tokens em {acesso.TOKENS_LOCAIS.name}")
 
 
 if __name__ == "__main__":
@@ -53,6 +56,11 @@ if __name__ == "__main__":
         baixar_dados.baixar_receitas()
         baixar_dados.baixar_tbca()
         baixar_dados.baixar_oms()
+        # C2 (src/integridade.py): o que foi baixado tem de ser o que o manifesto versionado espera.
+        # Download diferente aborta ANTES de indexar: um índice envenenado alcançaria todos os usuários.
+        integridade.exigir(conferir_indice=False)
         print("índice:", json.dumps(rag.indexar(), ensure_ascii=False))
+        integridade.gravar_manifesto_local()
+        integridade.exigir()
     config.DB_CHECKPOINTS.unlink(missing_ok=True)
     semear()

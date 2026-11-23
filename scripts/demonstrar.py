@@ -9,8 +9,8 @@ escrita à mão: tudo o que docs/io.md mostra sai daqui.
 import json
 import sys
 
+from scripts._identidade import executar  # executa como o dono de cada usuário fictício (token local, v1.1.0)
 from src.grafo import obter_grafo
-from src.main import executar
 
 CASOS = [
     (1, "ana", "caso1", "oi! o que eu posso fazer pra jantar hoje?"),

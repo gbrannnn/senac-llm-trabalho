@@ -76,3 +76,18 @@ def test_justificativa_sem_promessa_de_saude(texto, trocada):
     assert (motivo is not None) == trocada
     if trocada:
         assert "estoque" in novo and not grafo._PROMESSA.search(novo)
+
+
+def test_pessoas_e_tempo_saem_do_texto_quando_o_modelo_deixa_nulo():
+    """R05 da suíte v1.0.0: o modelo leu '4 pessoas em até 20 minutos' e deixou os campos nulos."""
+    r = receita_com("frango")
+    e = {**estado(r), "entrada": "quero um prato com frango pra 4 pessoas em até 20 minutos",
+         "triagem": {"ingredientes_citados": ["frango"], "pessoas": None, "tempo_max_min": None}}
+    saida = grafo.checar_pedido(e)
+    assert saida["triagem"]["pessoas"] == 4 and saida["triagem"]["tempo_max_min"] == 20
+    assert any("porções" in x for x in saida["escolhas"]) and any("tempo de preparo" in x for x in saida["escolhas"])
+
+
+def test_rapida_e_promessa_nao_verificavel():
+    novo, motivo = grafo._justificativa("Ela é rápida e usa o que você tem.", receita_com("frango"))
+    assert motivo is not None and "rápid" not in novo

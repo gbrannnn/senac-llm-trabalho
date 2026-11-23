@@ -9,3 +9,5 @@ dados/tbca.json
 dados/indice/
 dados/nutri.sqlite*
 dados/checkpoints.sqlite*
+# tokens em claro dos usuários fictícios (src/acesso.py): nunca no repositório
+dados/tokens_locais.json

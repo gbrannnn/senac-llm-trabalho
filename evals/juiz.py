@@ -160,6 +160,36 @@ def validar() -> None:
   -> {'ADOTADO' if resultado['adotado'] else 'NÃO ADOTADO'}; {len(desacordos)} desacordo(s) a ler, em {VALIDACAO.name}""")
 
 
+def julgar_rodada(pasta: str) -> None:
+    """Julga as recomendações de uma rodada já gravada (a rodada roda com --sem-juiz quando
+    o modelo do juiz não cabe junto na memória). Só altera o 'passou' se o juiz estiver adotado."""
+    from .rodar import carregar_dataset, placar
+    p = Path(pasta)
+    casos = [json.loads(l) for l in (p / "casos.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
+    meta = json.loads((p / "rodada.json").read_text(encoding="utf-8"))
+    por_id = {c["id"]: c for c in carregar_dataset()["casos"]}
+    meta["juiz_adotado"], meta["rubrica_juiz"], meta["modelo_juiz"] = adotado(), rubrica()["versao"], MODELO
+    for r in casos:
+        caso = por_id[r["id"]]
+        if not (caso["esperado"].get("juiz") and r["saida"].get("receita")):
+            continue
+        pedido = next(x["texto"] for x in reversed(caso["passos"]) if "texto" in x)
+        r["juiz"] = julgar_saida(pedido, r["saida"])
+        print(f"{r['id']:4s} {'adequada' if r['juiz']['adequada'] else 'NÃO adequada'} — {r['juiz']['motivo']}", flush=True)
+        r["verificacoes"] = [v for v in r["verificacoes"] if v["nivel"] != "juiz"]
+        if meta["juiz_adotado"]:
+            r["verificacoes"].append({"nivel": "juiz", "verificacao": "adequacao_receita", "passou": r["juiz"]["adequada"],
+                                      "detalhe": r["juiz"]["motivo"]})
+        r["passou"] = all(v["passou"] for v in r["verificacoes"])
+    (p / "casos.jsonl").write_text("".join(json.dumps(r, ensure_ascii=False, default=str) + "\n" for r in casos), encoding="utf-8")
+    meta["placar"] = placar(casos)
+    (p / "rodada.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
-    {"amostrar": amostrar, "validar": validar}[sys.argv[1]]()
+    comandos = {"amostrar": amostrar, "validar": validar}
+    if sys.argv[1] == "rodada":
+        julgar_rodada(sys.argv[2])
+    else:
+        comandos[sys.argv[1]]()

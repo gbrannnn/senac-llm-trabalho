@@ -17,6 +17,7 @@ import sys
 import time
 from datetime import datetime
 
+from scripts import _identidade  # noqa: F401 — executa como o dono de cada usuário fictício (v1.1.0)
 from src import config, db, llm, prompts, rag
 from src.registro import commit
 

@@ -15,7 +15,7 @@ from datetime import date, datetime
 
 import numpy as np
 
-from . import config
+from . import config, validacao
 
 ESQUEMA = """
 CREATE TABLE IF NOT EXISTS perfil (
@@ -30,6 +30,10 @@ CREATE TABLE IF NOT EXISTS historico (
     pedido TEXT, energia_kcal REAL, embedding BLOB, criado_em TEXT);
 CREATE TABLE IF NOT EXISTS escritas (
     chave TEXT PRIMARY KEY, tipo TEXT, usuario_id TEXT, conteudo TEXT, criado_em TEXT);
+-- v1.1.0 (src/acesso.py): o hash do token de cada usuário, e o estado de suspensão do agente
+CREATE TABLE IF NOT EXISTS credenciais (
+    usuario_id TEXT PRIMARY KEY, token_sha256 TEXT NOT NULL, papel TEXT NOT NULL, criado_em TEXT);
+CREATE TABLE IF NOT EXISTS controle (chave TEXT PRIMARY KEY, valor TEXT, por TEXT, em TEXT);
 """
 CAMPOS_LISTA = ("alergias", "restricoes", "preferencias", "equipamentos")
 
@@ -121,10 +125,18 @@ def somar_estoque(usuario_id: str, itens: list[dict], dia: str | None = None) ->
     return {"chave": k, "ja_existia": False, "gravados": len(normalizados)}
 
 
+class EscritaRecusada(ValueError):
+    """O valor não pode ir para a memória de longo prazo (src/validacao.py, controle C3)."""
+
+
 def atualizar_perfil(usuario_id: str, campo: str, operacao: str, valor: str) -> dict:
-    """Escrita por REGRA em código: o campo é validado contra uma lista fechada."""
+    """Escrita por REGRA em código: o campo é validado contra uma lista fechada, e o valor
+    pela validação de memória (C3). É a última linha: o nó extrair_perfil já checou, e se
+    não tiver checado, a escrita não acontece mesmo assim (fail-closed)."""
     if campo not in ("objetivo", *CAMPOS_LISTA):
-        raise ValueError(f"campo de perfil não permitido: {campo}")
+        raise EscritaRecusada(f"campo de perfil não permitido: {campo}")
+    if operacao != "remover" and (motivo := validacao.valor_de_perfil(campo, valor)):
+        raise EscritaRecusada(motivo)
     k = chave("perfil", usuario_id, campo, operacao, valor.strip().lower())
     with conexao() as con:
         if escrever_uma_vez(con, k, "perfil", usuario_id, {"campo": campo, "operacao": operacao, "valor": valor}):
@@ -147,6 +159,7 @@ def atualizar_perfil(usuario_id: str, campo: str, operacao: str, valor: str) -> 
 def registrar_recomendacao(usuario_id: str, receita: dict, pedido: str, energia_kcal: float | None,
                            embedding: np.ndarray | None, dia: str | None = None) -> dict:
     dia = dia or date.today().isoformat()
+    pedido = validacao.redigir(pedido)  # C4: e-mail, telefone, CPF do pedido não vão para o histórico
     k = chave("recomendacao", usuario_id, dia, receita["id"])
     with conexao() as con:
         if escrever_uma_vez(con, k, "recomendacao", usuario_id, {"receita_id": receita["id"], "dia": dia}):

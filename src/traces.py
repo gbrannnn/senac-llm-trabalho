@@ -5,6 +5,7 @@
     python -m src.traces caso1           # por parte do nome do arquivo
     python -m src.traces caso1 --raiz    # e todos os atributos da raiz (o registro da decisão)
     python -m src.traces --lista         # as últimas 20 execuções, uma por linha
+    python -m src.traces --expurgar      # apaga traces e logs de execução com mais de RETENCAO_DIAS (90)
 
 Cada arquivo é um JSONL com um span por linha, no formato do SDK do OpenTelemetry
 (`ReadableSpan.to_json`). Não há serviço a subir: o destino é o arquivo.
@@ -81,8 +82,33 @@ def desenhar(spans: list[dict], com_raiz: bool = False) -> str:
     return "\n".join(linhas)
 
 
+RETENCAO_DIAS = 90   # docs/model-card.md §11: o trace herda a classificação do dado pessoal que carrega
+
+
+def expurgar(dias: int = RETENCAO_DIAS, hoje: datetime | None = None) -> list[Path]:
+    """Apaga trace e log de execução mais velhos que `dias`, pela data no nome (AAAAMMDD-HHMMSS_...).
+
+    Apaga da pasta de trabalho. As execuções citadas como evidência na entrega continuam no
+    histórico do git (só usuários fictícios), e isso está declarado no model card §11."""
+    limite = (hoje or datetime.now()).timestamp() - dias * 86400
+    apagados = []
+    for arq in sorted(TRACES.glob("*.jsonl")) + sorted(config.LOGS.glob("2*.jsonl")):
+        try:
+            quando = datetime.strptime(arq.name[:15], "%Y%m%d-%H%M%S").timestamp()
+        except ValueError:
+            continue
+        if quando < limite:
+            arq.unlink()
+            apagados.append(arq)
+    return apagados
+
+
 def main() -> None:
     sys.stdout.reconfigure(encoding="utf-8")
+    if "--expurgar" in sys.argv:
+        apagados = expurgar()
+        print(f"{len(apagados)} arquivo(s) com mais de {RETENCAO_DIAS} dias apagado(s)")
+        return
     args = [x for x in sys.argv[1:] if not x.startswith("--")]
     if "--lista" in sys.argv:
         for arq in sorted(TRACES.glob("*.jsonl"))[-20:]:

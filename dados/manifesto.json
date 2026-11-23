@@ -1,0 +1,15 @@
+{
+ "sobre": "SHA-256 esperado de cada arquivo do corpus e versão esperada de cada índice (src/integridade.py)",
+ "arquivos": {
+  "dados/corpus/receitas.jsonl": "a453f4bb2bb9ba2150266539f59921f1d5e6f7856bd083a1753a050c82778a3c",
+  "dados/catalogo_ingredientes.json": "02775535fa17f83e94a49fd54fabf7a24d455566b91b52462b63bc2dbd549a37",
+  "dados/tbca.json": "b10b6a6406ee87a06827d1a2da2fefbe43fba25167f17c91f7d33a941d42ca85",
+  "dados/corpus/oms/oms-alimentacao-saudavel-2026.md": "30b7f24f9848e2f57f1fed9667127bb83cc55b2876b0c3e6579aac564395f3ab",
+  "dados/corpus/oms/oms-sal-2018.md": "8d11629731f18aa2af6e19a5bd307ed128f13cc20356eade8e4c79937c327f66",
+  "dados/corpus/oms/oms-sodio-2026.md": "01ad7cb244682235a06d6c0c681bc0671060418b3c2b00601d0ab0f3e29b39af"
+ },
+ "indices": {
+  "receitas": "idx-receitas-60d982053e0f",
+  "oms": "idx-oms-9ee6cda7b95b"
+ }
+}

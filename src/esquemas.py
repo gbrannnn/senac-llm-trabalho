@@ -107,7 +107,9 @@ class ReceitaSaida(BaseModel):
 Termino = Literal[
     "concluido", "pergunta_ao_usuario", "recusa_fora_escopo", "recusa_sem_base", "sem_acao",
     "aguardando_humano", "rejeitado_pelo_humano", "aprovacao_expirada",
-    "teto_passos", "teto_rodadas", "teto_tokens", "teto_tempo", "laco_detectado", "erro_fatal"]
+    "teto_passos", "teto_rodadas", "teto_tokens", "teto_tempo", "laco_detectado", "erro_fatal",
+    # v1.1.0: términos dos controles da Parte 3 (docs/seguranca.md §3.2), todos fail-closed
+    "acesso_negado", "suspenso", "integridade_violada", "escrita_bloqueada"]
 
 
 class Saida(BaseModel):

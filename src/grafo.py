@@ -20,7 +20,7 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import interrupt
 
-from . import catalogo, citacao, config, db, esquemas, ferramentas, llm, memoria, nutricional, rag, telemetria
+from . import catalogo, citacao, config, db, escopo, esquemas, ferramentas, llm, memoria, nutricional, rag, telemetria, validacao
 from . import traducao as traducao_mod
 from .estado import Estado, EstadoSemReducer
 from .prompts import carregar
@@ -125,7 +125,14 @@ def carregar_historico(estado: Estado) -> dict:
 # --- triagem ---------------------------------------------------------------------
 
 @no
-def triagem(estado: Estado) -> dict:  # MODELO
+def triagem(estado: Estado) -> dict:  # MODELO (exceto quando o código já decidiu)
+    # C6 (src/escopo.py): prescrever, dosar e diagnosticar são ações proibidas. Decidido em código,
+    # ANTES do modelo: o modelo não é chamado e não tem como reclassificar o pedido.
+    if motivo := escopo.proibido(estado["entrada"]):
+        return {"triagem": {"rota": "fora_escopo", "acao_futura": False, "ingredientes_citados": [], "pessoas": None,
+                            "tempo_max_min": None, "justificativa": f"pedido de {motivo}: bloqueado em código (src/escopo.py)",
+                            "decidido_por": "codigo"},
+                "escolhas": [f"recusado por regra em código, sem consultar o modelo: pedido de {motivo}"]}
     conversa = "\n".join(f"{m['role']}: {m['content'][:200]}" for m in estado.get("conversa", [])) or "(vazia)"
     resultado, uso = llm.estruturada(carregar("sistema").texto,
                                      carregar("triagem").formatar(entrada=estado["entrada"], conversa=conversa),
@@ -137,6 +144,10 @@ def rota_triagem(estado: Estado) -> str:
     if estado.get("termino"):
         return "fim"
     t = estado["triagem"]
+    # Fora do escopo vem ANTES do futuro (v1.1.0): "qual ação da bolsa eu compro amanhã?" é fora do
+    # escopo, e não "você falou do futuro" (caso X02 da suíte, que falhava na v1.0.0).
+    if t["rota"] == "fora_escopo":
+        return "fora_escopo"
     # Regra em código: falar do futuro não dispara ação (nem escrita, nem recomendação registrada).
     # Decide pelo campo `acao_futura`, que o modelo acerta de forma estável; a ROTA desses
     # pedidos oscilou entre versões do prompt (E07: "vou comprar peixe amanhã" -> recomendar).
@@ -167,6 +178,10 @@ def checar_pedido(estado: Estado) -> dict:
     if not estoque and not t["ingredientes_citados"]:
         return {"termino": "pergunta_ao_usuario", "escolhas": ["estoque vazio e nenhum ingrediente citado"]}
     escolhas, extras = [], []
+    # v1.1.0: número de pessoas e tempo também por regra em código. Na rodada v1.0.0 (caso R05) o modelo
+    # leu "4 pessoas em até 20 minutos" na justificativa e deixou os dois campos nulos: nada foi declarado.
+    t = {**t, "pessoas": t.get("pessoas") or _numero_antes(estado["entrada"], r"pessoas?|por[cç][oõ]es"),
+         "tempo_max_min": t.get("tempo_max_min") or _numero_antes(estado["entrada"], r"min(utos?)?\b")}
     no_estoque = {i["item_id"] for i in estoque}
     for nome in t["ingredientes_citados"]:
         candidatos = catalogo.casar_pt(nome).candidatos
@@ -178,7 +193,12 @@ def checar_pedido(estado: Estado) -> dict:
         escolhas.append(f"O acervo não informa tempo de preparo: não consigo garantir {t['tempo_max_min']} minutos.")
     if t.get("pessoas"):
         escolhas.append(f"O acervo não informa porções: não consigo garantir que serve {t['pessoas']} pessoas.")
-    return {"disponiveis_extra": extras, "escolhas": escolhas}
+    return {"disponiveis_extra": extras, "escolhas": escolhas, "triagem": t}
+
+
+def _numero_antes(texto: str, unidade: str) -> int | None:
+    m = re.search(rf"\b(\d{{1,3}})\s*(?:{unidade})", texto, re.I)
+    return int(m.group(1)) if m else None
 
 
 def rota_checar(estado: Estado) -> str:
@@ -375,7 +395,8 @@ def rota_avaliador(estado: Estado) -> str:
 @no
 def registrar(estado: Estado) -> dict:
     receita = rag.receitas_por_id()[estado["proposta"]["receita_id"]]
-    vetor = memoria.embedding_episodio(estado["entrada"], receita["nome"])
+    # C4: o histórico guarda o pedido para não repetir receita, e não precisa de e-mail nem telefone
+    vetor = memoria.embedding_episodio(validacao.redigir(estado["entrada"]), receita["nome"])
     efeito = _escrever("registrar_recomendacao", {"receita_id": receita["id"]},
                        lambda: db.registrar_recomendacao(estado["usuario_id"], receita, estado["entrada"],
                                                          (estado.get("nutricao") or {}).get("energia_kcal"), vetor))
@@ -581,8 +602,12 @@ def extrair_perfil(estado: Estado) -> dict:  # MODELO
     atualizacao, uso = llm.estruturada(carregar("sistema").texto,
                                        carregar("extrair_perfil").formatar(entrada=estado["entrada"]),
                                        esquemas.AtualizacaoPerfil)
-    return {"atualizacao_perfil": atualizacao.model_dump(), "uso": uso,
-            "expira_em": time.time() + config.PRAZO_APROVACAO_S}
+    a = atualizacao.model_dump()
+    # C3 (src/validacao.py): o perfil volta ao prompt do chef em TODA execução futura. Valor com dado
+    # pessoal ou com cara de instrução não é gravado. A remoção não é checada: tirar não injeta nada.
+    if a["operacao"] != "remover" and (motivo := validacao.valor_de_perfil(a["campo"], a["valor"])):
+        return {"atualizacao_perfil": a, "uso": uso, "termino": "escrita_bloqueada", "escolhas": [motivo]}
+    return {"atualizacao_perfil": a, "uso": uso, "expira_em": time.time() + config.PRAZO_APROVACAO_S}
 
 
 def rota_perfil(estado: Estado) -> str:
@@ -612,8 +637,11 @@ def confirmar_perfil(estado: Estado) -> dict:
 @no
 def gravar_perfil(estado: Estado) -> dict:
     a = estado["atualizacao_perfil"]
-    efeito = _escrever("atualizar_perfil", a,
-                       lambda: db.atualizar_perfil(estado["usuario_id"], a["campo"], a["operacao"], a["valor"]))
+    try:
+        efeito = _escrever("atualizar_perfil", a,
+                           lambda: db.atualizar_perfil(estado["usuario_id"], a["campo"], a["operacao"], a["valor"]))
+    except db.EscritaRecusada as erro:  # a segunda linha do C3, no próprio banco
+        return {"termino": "escrita_bloqueada", "escolhas": [str(erro)]}
     return {"efeito": efeito, "termino": "concluido",
             "fontes": [{"tipo": "usuario", "id": estado["execucao_id"], "detalhe": "mensagem da pessoa"}]}
 
@@ -643,9 +671,15 @@ def montar_saida(estado: Estado) -> esquemas.Saida:
         return esquemas.Saida(**base, tipo="erro", resultado="Não consegui processar agora (falha interna). Tente de novo.",
                               suficiencia="insuficiente", motivo_suficiencia=estado.get("erro"))
     if termino == "recusa_fora_escopo":
+        futuro = (" Também não registro o que você ainda vai fazer, nem envio lembretes."
+                  if (estado.get("triagem") or {}).get("acao_futura") else "")
         return esquemas.Saida(**base, tipo="recusa", suficiencia="fora_de_escopo",
-                              resultado=f"Isso está fora do que eu faço. {ESCOPO}",
+                              resultado=f"Isso está fora do que eu faço. {ESCOPO}{futuro}",
                               motivo_suficiencia=estado["triagem"]["justificativa"])
+    if termino == "escrita_bloqueada":
+        return esquemas.Saida(**base, tipo="perfil", suficiencia="insuficiente",
+                              resultado="Não gravei isso no seu perfil: " + "; ".join(estado.get("escolhas", [])) + ".",
+                              motivo_suficiencia="valor recusado pela validação de escrita (src/validacao.py)")
     if termino == "sem_acao":
         texto = ("Não registrei nada: você falou do que ainda vai fazer, e eu só registro o que já aconteceu. "
                  "Também não envio lembretes. Quando comprar, me diga o que chegou."
@@ -707,7 +741,9 @@ def montar_saida(estado: Estado) -> esquemas.Saida:
 # Promessa de benefício e adjetivo de saúde: o prompt do chef proíbe (v1.3.0) e o modelo
 # escreve mesmo assim ("ajuda na manutenção do peso", "leve e saudável" para 1.914 kcal).
 _PROMESSA = re.compile(r"saud[aá]vel|ajuda(r)? (a|na|no)|[oó]tima op[cç][aã]o|boa op[cç][aã]o|leve\b|emagrec|"
-                       r"manuten[cç][aã]o do peso|manter o peso|ganho de massa|nutritiv", re.I)
+                       r"manuten[cç][aã]o do peso|manter o peso|ganho de massa|nutritiv|"
+                       # v1.1.0: o acervo não tem tempo de preparo, então "rápida" não é verificável (R05 da v1.0.0)
+                       r"r[aá]pid[ao]s?|f[aá]cil de|em poucos minutos", re.I)
 
 
 def _justificativa(texto: str, receita: dict) -> tuple[str, str | None]:
