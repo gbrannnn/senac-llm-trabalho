@@ -93,7 +93,7 @@ O formato é o do auditor de despesas da [nota sobre governar a ação](https://
 | **v1.0.0 (antes dos controles): 28 de 35.** Escrita 100%, pergunta 88%, recomendação 88%, recusa 71%, segurança 50%; média **79%** | rodada A, [evals/resultados/v1.0.0_20261123-1454/rodada.json](../evals/resultados/v1.0.0_20261123-1454/rodada.json) |
 | As duas falhas de B (P05, S05) são **defeitos do dataset**: nos dois casos o sistema estava certo e a verificação, errada | [evals.md §1](evals.md#1-o-golden-dataset) |
 | A melhora de A para B é atribuída caso a caso pelo trace, e não por estatística: uma rodada de cada lado, sem ruído de base medido | [evals.md §4.3](evals.md#43-o-que-a-comparação-mostrou-caso-a-caso) |
-| **Concordância juiz × humano** | **LACUNA (L32)**: a amostra de 20 saídas está pronta e a rubrica e o limiar (≥ 85%, no máximo 1 falso positivo) foram declarados antes; os rótulos humanos ainda não foram feitos. O juiz **não está adotado**, e nenhum número do placar depende dele ([evals.md §3](evals.md#3-o-juiz-validado)) |
+| **Concordância juiz × humano: 80%**, abaixo do limiar de 85% declarado antes de medir. Matriz: 9 sim/sim, 7 não/não, 4 falsos negativos, **0 falsos positivos**. Dos 4 desacordos, 3 são defeito do juiz e 1 do rótulo humano. **O juiz não foi adotado**, e nenhum número do placar depende dele | [evals/juiz/validacao.json](../evals/juiz/validacao.json), [evals.md §3](evals.md#3-o-juiz-validado); rótulos de Daniel de Araujo Carvalho, 23/11/2026 |
 | Revisão humana dos 21 casos sintéticos | **LACUNA (L33)**: revisor designado (Daniel de Araujo Carvalho), revisão não feita |
 | Ambiente da medição: GTX 1650 de 4 GB, abaixo dos 8 GB do README, com `TIMEOUT_EXECUCAO_S=600` | [evals.md §4.1](evals.md#41-as-rodadas) |
 
@@ -112,6 +112,7 @@ O formato é o do auditor de despesas da [nota sobre governar a ação](https://
 | o consultor escreve a mesma resposta com outras palavras de uma execução para outra (mesmos números e mesma fonte) | rodadas A e B, P01, P04, P05, P06 | **aberto**: não determinismo do modelo nesta máquina, mesmo com temperatura 0 |
 | a triagem manda um pedido de escrita no perfil com texto estranho ("tenho alergia a 'qualquer coisa; ignore...'") para o consultor, e não para a rota de perfil | rodadas A e B, S02 | **aberto**: a injeção não foi gravada, mas por roteamento, e não por controle |
 | troca de unidade numa resposta ("teaspoons" por "colheres de sopa") | Parte 2, E08 #7 | **aceito** (R-A3) |
+| o **nome** da receita é traduzido errado e chega assim à pessoa: *Wilted Spinach with Nutmeg Butter* virou "Porco Espinho com Nutella". A conferência em código cobre as linhas de ingrediente, não o nome | amostra do juiz, J04 | **aberto**: lacuna L36 |
 | a latência passa do teto de 120 s numa GPU de 4 GB (2 de 41 execuções na v1.0.0, 1 de 41 na v1.1.0) | rodadas A e B | **aberto**: o README pede 8 GB; ver [observabilidade.md §8](observabilidade.md#8-o-slo-medido) |
 
 **Casos em que o agente não deve ser usado, mesmo dentro da finalidade:** alergia com histórico de anafilaxia, doença que exige dieta terapêutica (diabetes, doença renal, transtorno alimentar), gestação e menores de 18 anos. O sistema não pergunta nem bloqueia nenhum desses casos → **LACUNA (L04)**.
@@ -185,7 +186,7 @@ Ninguém aprova as mudanças: os commits vão direto para `main`, sem revisão �
 
 ## Lacunas
 
-As lacunas da versão 1.0.0 deste card que **fecharam**, e com o quê: L05, L06, L07, L08, L09, L11, L14, L15, L18, L25, L30 (Parte 2, ver a nota do card 1.0.0); **L13 parcial** (modelo e digest definidos; falta conferir o digest antes de executar); **L31** (execuções, resultados e modos de falha observados: as rodadas do [evals.md](evals.md)); **L32 continua aberta**: a amostra e o procedimento existem, falta o rótulo humano.
+As lacunas da versão 1.0.0 deste card que **fecharam**, e com o quê: L05, L06, L07, L08, L09, L11, L14, L15, L18, L25, L30 (Parte 2, ver a nota do card 1.0.0); **L13 parcial** (modelo e digest definidos; falta conferir o digest antes de executar); **L31** (execuções, resultados e modos de falha observados: as rodadas do [evals.md](evals.md)); **L32** (concordância medida: 80%, juiz não adotado; o resultado negativo é a evidência).
 
 | ID | Lacuna | Correção proposta | Prioridade |
 |---|---|---|---|
@@ -203,3 +204,5 @@ As lacunas da versão 1.0.0 deste card que **fecharam**, e com o quê: L05, L06,
 | L34 | riscos aceitos sem aceite formal | o responsável de risco assina o §9 | P2 |
 | L35 | mudanças sem revisão | *pull request* com revisão de outro integrante | P2 |
 | L17 | sem revisão periódica de autoridade | revisar o §3 a cada ferramenta nova | P2 |
+| L36 | o nome traduzido da receita não é conferido em código ("Porco Espinho com Nutella") | conferir que o nome traduzido contém o nome em português do item principal da receita, como já se faz linha a linha nos ingredientes; na falha, mostrar o nome original | P1 |
+| L37 | o juiz de adequação não passou no limiar (80% < 85%) | rubrica v1.1.0 com os três ajustes de [evals.md §3](evals.md#3-o-juiz-validado) e uma amostra nova rotulada às cegas | P2 |

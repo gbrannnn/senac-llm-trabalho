@@ -1,0 +1,20 @@
+{"id": "J01", "adequada": true, "motivo": "A receita é um prato de almoço, com arroz preto, ovo frito e brócolis assado, o que atende ao pedido da pessoa.", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J02", "adequada": false, "motivo": "a receita é um prato de jantar, não um lanche", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J03", "adequada": false, "motivo": "a receita é um prato de jantar, não café da manhã", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J04", "adequada": true, "motivo": "A receita é um prato de jantar e contém espinafre como ingrediente principal.", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J05", "adequada": true, "motivo": "A receita é um prato de batata, que atende ao pedido da pessoa", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J06", "adequada": false, "motivo": "a receita é um prato de macarrão, mas o pedido era apenas um molho para acompanhar o macarrão", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J07", "adequada": false, "motivo": "a receita é um prato de frango, não um acompanhamento", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J08", "adequada": true, "motivo": "A receita é um prato de jantar, que inclui arroz preto, ovo frito e brócolis assado, o que atende ao pedido da pessoa.", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J09", "adequada": false, "motivo": "a receita é um prato de massa, mas a pessoa pediu apenas uma massa, sem especificar o tipo de massa ou acompanhamento", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J10", "adequada": false, "motivo": "A receita recomendada é um prato de frango frito, não uma sopa.", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J11", "adequada": true, "motivo": "A receita Burst Cherry Tomato Pasta atende ao pedido da pessoa, que pediu algo com tomate e queijo. A receita inclui tomate (cherry tomatoes) e queijo (Parmesan).", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J12", "adequada": true, "motivo": "A receita é um prato com arroz, que é o que a pessoa pediu.", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J13", "adequada": true, "motivo": "A receita é uma salada, que é o que a pessoa pediu.", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J14", "adequada": false, "motivo": "a receita é um prato de acompanhamento, não um almoço completo", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J15", "adequada": true, "motivo": "A receita é um prato de jantar e contém ovo.", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J16", "adequada": false, "motivo": "a receita é para fazer um pão caseiro, mas a receita fornecida é para uma massa de pastel", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J17", "adequada": true, "motivo": "A receita é um petisco, que é um tipo de acompanhamento, e a pessoa pediu um petisco para receber visita.", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J18", "adequada": false, "motivo": "A receita recomendada é um prato de arroz com ovos e brócolis, mas não inclui frango como solicitado.", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J19", "adequada": false, "motivo": "a receita é um acompanhamento e a pessoa pediu um ingrediente", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}
+{"id": "J20", "adequada": false, "motivo": "a receita é um prato de arroz com acompanhamentos, mas a pessoa pediu um almoço rápido com ovo", "rubrica": "1.0.0", "modelo": "llama3.1:8b", "modelo_servido": "llama3.1:8b"}

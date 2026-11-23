@@ -74,13 +74,42 @@ As verificações estão em [evals/verificacoes.py](../evals/verificacoes.py) e 
 
 **O limiar, declarado antes de medir** (na rubrica, commit `0169175`, antes de qualquer saída ser julgada ou rotulada): adotar só com **concordância ≥ 85%** (17 de 20) **e no máximo 1 falso positivo** (o juiz dizendo "adequada" quando o humano diz que não). O falso positivo é o erro que importa: é o crouton passando como almoço.
 
-**A validação: amostra pronta, rótulos humanos PENDENTES, juiz NÃO ADOTADO.**
+**A validação: concordância 80%, abaixo do limiar de 85%. O juiz NÃO foi adotado.**
 
-1. **As 20 saídas** ([evals/juiz/amostra.jsonl](../evals/juiz/amostra.jsonl)) são recomendações reais da v1.1.0, geradas por `python -m evals.juiz amostrar` a partir de 24 pedidos variados (almoço, lanche, café da manhã, sobremesa, sopa, molho, petisco, pão...); 4 pedidos terminaram sem receita e ficaram de fora. A amostra tem casos dos dois lados à primeira vista: "uma sopa, por favor" virou *Kefir-Battered Cast-Iron Fried Chicken*, "quero um pão caseiro" virou *Rough Puff Pastry Dough* (uma massa crua), "quero um molho pra acompanhar o macarrão" virou um espaguete inteiro.
-2. **Os rótulos humanos** vão em [evals/juiz/rotulos.csv](../evals/juiz/rotulos.csv): `rotulo_humano` (`sim`/`nao`), `nota` (uma frase por caso, obrigatória) e `rotulador`. O rotulador designado é Daniel de Araujo Carvalho. **Ainda não foi feito.** A planilha não mostra o veredito do juiz, e o juiz **não foi rodado** sobre a amostra: o `validar` só roda o juiz depois que os 20 rótulos existem, para que um não veja o outro.
-3. **Depois de rotular:** `python -m evals.juiz validar` roda o juiz, imprime a matriz juiz × humano, decide a adoção pelo limiar e grava os desacordos em `evals/juiz/validacao.json` (o arquivo só existe depois do `validar`). Cada desacordo é lido e classificado à mão na coluna `classificacao_desacordo` (defeito do **juiz**, da **rubrica** ou do **rótulo humano**).
+1. **As 20 saídas** ([evals/juiz/amostra.jsonl](../evals/juiz/amostra.jsonl)) são recomendações reais da v1.1.0, geradas por `python -m evals.juiz amostrar` a partir de 24 pedidos variados (almoço, lanche, café da manhã, sobremesa, sopa, molho, petisco, pão...); 4 pedidos terminaram sem receita e ficaram de fora.
+2. **Os rótulos humanos** foram feitos por **Daniel de Araujo Carvalho**, em 23/11/2026, numa planilha que não mostrava o juiz, e **antes** de o juiz ser rodado sobre a amostra. A planilha que ele devolveu está como ele a salvou, em [evals/juiz/rotulos_respondido.csv](../evals/juiz/rotulos_respondido.csv) (formato do Excel); a que o `validar` lê é [evals/juiz/rotulos.csv](../evals/juiz/rotulos.csv). Uma nota por caso. Resultado: 13 `sim`, 7 `nao`.
+3. **Uma correção, feita antes de rodar o juiz.** No J04 ("quero um jantar com espinafre" → *Wilted Spinach with Nutmeg Butter*, com 4 libras de espinafre), o rótulo original era `nao`, com a nota "a sugestão não tinha espinafre". A nota veio do **nome traduzido** pelo sistema, que saiu **"Porco Espinho com Nutella"**. O rotulador corrigiu para `sim`, e a nota registra a correção. Esse erro de tradução é um modo de falha do sistema, e não do juiz ([observabilidade.md §3](observabilidade.md#3-os-modos-de-falha)).
+4. **O juiz rodou** com `python -m evals.juiz validar`, sobre as 20 saídas, contra os rótulos já fixados:
 
-Até lá, **o juiz não está adotado**: os vereditos dele são gravados nas rodadas, mas não entram no "passou" de nenhum caso (`juiz_adotado: false` em `rodada.json`), e o placar do §4 é só das verificações dos outros três níveis.
+```text
+                     humano: sim   humano: não
+  juiz: sim                9             0   <- falsos positivos
+  juiz: não                4             7
+
+  concordância 80% (limiar 85%) · falsos positivos 0 (máximo 1)
+  -> NÃO ADOTADO; 4 desacordo(s) a ler, em validacao.json
+```
+
+O resultado completo, com o motivo do juiz em cada caso, está em [evals/juiz/validacao.json](../evals/juiz/validacao.json) e [evals/juiz/veredictos.jsonl](../evals/juiz/veredictos.jsonl).
+
+**Os quatro desacordos, lidos um a um** (classificados pelo rotulador; a classificação está na coluna `classificacao_desacordo` da planilha):
+
+| Caso | Pedido → receita | Humano | Juiz, e o motivo dele | Defeito de quem | Por quê |
+|---|---|---|---|---|---|
+| **J07** | "me sugere um **acompanhamento** pro frango" → *Garlic and Herb Spatchcock Grilled Chicken* | sim | não: "é um prato de frango, não um acompanhamento" | **rótulo humano** | a pessoa pediu um tipo de prato (acompanhamento) e veio o prato principal; pela rubrica, o juiz estava certo |
+| **J09** | "quero uma massa" → *Kale, Tomato, and Lemon Magic One-Pot Spaghetti* | sim | não: "pediu apenas uma massa, sem especificar o tipo de massa" | **juiz** | espaguete é massa; o motivo não sustenta o veredito |
+| **J14** | "o que eu almoço hoje?" → *Stir-Fried Black Rice with Fried Egg and Roasted Broccoli* | sim | não: "é um prato de acompanhamento, não um almoço completo" | **juiz** | é a **mesma receita** do J01 ("o que eu faço pro almoço?"), que o juiz aprovou: o mesmo caso com o veredito trocado |
+| **J20** | "almoço rápido com ovo" → a mesma receita | sim | não: "é um prato de arroz com acompanhamentos, mas a pessoa pediu um almoço rápido com ovo" | **juiz** | a receita tem ovo; o tempo, a rubrica manda não julgar (o acervo não tem tempo de preparo) |
+
+**Os acordos também não são todos bons.** No J19 ("uma receita com cebola e alho" → *Spaghetti with Garlic*), juiz e humano disseram `nao`, mas o motivo do juiz está errado ("a receita é um acompanhamento"); o que falta é a cebola. Um acordo pelo motivo errado não aparece na matriz.
+
+**O que a matriz diz, além do número.** O juiz não deixou passar nenhuma receita inadequada (0 falsos positivos), que é o erro que a rubrica mais temia. O defeito dele é o outro: **reprova o que é bom** (4 falsos negativos em 13 positivos), e de forma **inconsistente** (J01 × J14). Adotado, ele derrubaria casos que passam por razões que não se repetem de uma execução para outra.
+
+**Por que a concordância não foi recalculada com o J07 corrigido.** Os rótulos foram fixados antes de ver o juiz. Corrigir o J07 agora daria 85%, o limiar exato, e isso seria ajustar o instrumento ao resultado: a correção do J04 foi aceita porque é um erro de fato, achado **antes** do juiz rodar; a do J07 só foi vista **por causa** do juiz. O número oficial é **80%**, e o juiz **não é adotado**.
+
+**O que faríamos.** Três mudanças na rubrica para a v1.1.0 dela, cada uma vinda de um desacordo: (1) dizer que o pedido de um **tipo** de prato ("acompanhamento", "sopa", "molho") exige esse tipo, o que teria evitado o J07 do lado humano; (2) dar ao juiz o critério de **consistência**: arroz com ovo frito não é acompanhamento, com um exemplo; (3) repetir que "rápido" e porções não se julgam. Depois, uma amostra **nova** de 20, rotulada às cegas de novo: rodar a rubrica nova na mesma amostra mediria a rubrica contra os exemplos que a inspiraram.
+
+**Consequência para o placar.** Os vereditos do juiz continuam gravados nas rodadas, mas **não entram** no "passou" de nenhum caso (`juiz_adotado: false`), e o placar do §4 é só das verificações dos outros três níveis.
 
 **O que o juiz já disse, sobre as recomendações da suíte** (`python -m evals.juiz rodada <pasta>`, fora do placar; os mesmos vereditos em A e B, porque as receitas foram as mesmas):
 
@@ -91,7 +120,7 @@ Até lá, **o juiz não está adotado**: os vereditos dele são gravados nas rod
 | R05 | prato com frango pra 4 pessoas em 20 minutos | Crispy Chicken with Shallots | **não** | "a receita é um prato de frango, mas ignora o ingrediente 'frango'" |
 | R07 | to com fome, o que eu almoço? | Stir-Fried Black Rice with Fried Egg and Roasted Broccoli | **não** | "é um prato de acompanhamento, mas o pedido é para almoço" |
 
-O motivo do R05 se contradiz (a receita é de frango, e o juiz diz que ela ignora o frango); o do R07 chama de acompanhamento um prato de arroz com ovo. São dois sinais, antes de qualquer rótulo, de que o juiz pode não passar no limiar. A validação vai dizer quanto.
+O motivo do R05 se contradiz (a receita é de frango, e o juiz diz que ela ignora o frango); o do R07 chama de acompanhamento um prato de arroz com ovo. Os dois casos foram aprovados pelo humano na amostra com a mesma receita ou o mesmo tipo de pedido (J01, J14), e o R07 repete exatamente o erro do J14: a validação acima confirmou o que estes motivos já mostravam.
 
 ## 4. A suíte rodando, e o resultado
 
@@ -113,7 +142,7 @@ Cada pasta tem `rodada.json` (versões, commit, modelos, ambiente e placar), `ca
 ```text
 $ python -m evals.comparar evals/resultados/v1.0.0_20261123-1454 evals/resultados/v1.1.0_20261123-1523
 DATASET v1.0.0   35 casos   (producao 0 · desenvolvimento 14 · sintetico 21)
-JUIZ rubrica v1.0.0   concordância não medida   limiar 85%   (não adotado: fora do placar)
+JUIZ rubrica v1.0.0   concordância 80%   limiar 85%   (NÃO adotado: fora do placar)
 
 A = v1.0.0 (0169175, 2026-11-23T14:54)   B = v1.1.0 (690d960, 2026-11-23T15:23)
 

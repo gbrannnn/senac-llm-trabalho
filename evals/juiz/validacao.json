@@ -1,0 +1,61 @@
+{
+ "rubrica": "1.0.0",
+ "modelo_juiz": "llama3.1:8b",
+ "n": 20,
+ "matriz": {
+  "juiz_sim_humano_sim": 9,
+  "juiz_sim_humano_nao": 0,
+  "juiz_nao_humano_sim": 4,
+  "juiz_nao_humano_nao": 7
+ },
+ "concordancia": 0.8,
+ "falsos_positivos": 0,
+ "falsos_negativos": 4,
+ "limiar": {
+  "concordancia": 0.85,
+  "max_falsos_positivos": 1
+ },
+ "adotado": false,
+ "rotuladores": [
+  "Daniel de Araujo Carvalho"
+ ],
+ "desacordos": [
+  {
+   "id": "J07",
+   "juiz": false,
+   "humano": true,
+   "motivo_juiz": "a receita é um prato de frango, não um acompanhamento",
+   "nota_humana": "sugeriu um frango com acompanhamentos",
+   "classificacao": "rotulo_humano",
+   "classificado_por": "Daniel de Araujo Carvalho, 23/11/2026"
+  },
+  {
+   "id": "J09",
+   "juiz": false,
+   "humano": true,
+   "motivo_juiz": "a receita é um prato de massa, mas a pessoa pediu apenas uma massa, sem especificar o tipo de massa ou acompanhamento",
+   "nota_humana": "recomendou um prato cumprindo as exigencias nesse caso a massa",
+   "classificacao": "juiz",
+   "classificado_por": "Daniel de Araujo Carvalho, 23/11/2026"
+  },
+  {
+   "id": "J14",
+   "juiz": false,
+   "humano": true,
+   "motivo_juiz": "a receita é um prato de acompanhamento, não um almoço completo",
+   "nota_humana": "recomendou um almoco que foi a exigencia",
+   "classificacao": "juiz",
+   "classificado_por": "Daniel de Araujo Carvalho, 23/11/2026"
+  },
+  {
+   "id": "J20",
+   "juiz": false,
+   "humano": true,
+   "motivo_juiz": "a receita é um prato de arroz com acompanhamentos, mas a pessoa pediu um almoço rápido com ovo",
+   "nota_humana": "receita rapida e com ovo que foi o solicitado",
+   "classificacao": "juiz",
+   "classificado_por": "Daniel de Araujo Carvalho, 23/11/2026"
+  }
+ ],
+ "nota": "Rótulos fixados ANTES de rodar o juiz (o J04 foi corrigido antes, por erro de fato: o nome traduzido errado). O J07 foi classificado como defeito do rótulo humano, mas a concordância NÃO é recalculada com o rótulo corrigido: corrigir depois de ver o juiz, para alcançar o limiar, seria ajustar o instrumento ao resultado."
+}
