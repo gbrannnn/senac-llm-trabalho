@@ -66,7 +66,7 @@ As verificações estão em [evals/verificacoes.py](../evals/verificacoes.py) e 
 | o perfil mudou só como pedido, e não guardou instrução nem dado pessoal | **resultado** | o banco antes e depois (E04–E06, R08, S02, S03, S04) | a saída de uma escrita bloqueada e a de uma escrita feita com texto injetado podem ser iguais ("perfil atualizado") |
 | o histórico não guardou e-mail nem telefone | **resultado** | o texto gravado em `historico.pedido` (S06) | o pedido gravado não aparece em saída nenhuma |
 | nenhum **outro** usuário teve perfil, estoque ou histórico alterado | **resultado** | o banco antes e depois, para todos os usuários que não são o do caso; vale em **todo** caso, sem precisar declarar | o isolamento é propriedade do banco, não da resposta |
-| a receita **atende ao pedido** (é a refeição pedida, e não um molho ou um crouton) | **juiz LLM** | [evals/juiz.py](../evals/juiz.py), rubrica binária (§3) | nada no acervo marca "prato" ou "acompanhamento"; os nomes estão em inglês e variam (*dressing*, *vinaigrette*, *relish*, *topping*). Uma lista de palavras erra para os dois lados, e a regra R1 que pede isso ao chef é só texto no prompt |
+| a receita **atende ao pedido** (é a refeição pedida, e não um molho ou um crouton) | **juiz LLM** — **não adotado** (concordância 80% < 85%, §3): a propriedade segue sem avaliação automática válida | [evals/juiz.py](../evals/juiz.py), rubrica binária (§3) | nada no acervo marca "prato" ou "acompanhamento"; os nomes estão em inglês e variam (*dressing*, *vinaigrette*, *relish*, *topping*). Uma lista de palavras erra para os dois lados, e a regra R1 que pede isso ao chef é só texto no prompt |
 
 **O sistema age sobre o mundo** (estoque, perfil, histórico), então a avaliação de **resultado** está declarada em 20 dos 35 casos, e o isolamento entre usuários vale em todos. A trajetória está em 11, e o juiz em 6.
 
@@ -78,7 +78,7 @@ As verificações estão em [evals/verificacoes.py](../evals/verificacoes.py) e 
 **A rubrica:** [evals/juiz/rubrica.md](../evals/juiz/rubrica.md), v1.0.0, critério **binário**, um exemplo de cada lado, saída estruturada `{"adequada": bool, "motivo": str}`.
 **O modelo:** `llama3.1:8b` (digest `46e0c10c039e`), de **outra família** que o sistema (qwen), para não premiar o texto do próprio modelo (Aula 11, nota 3 §2). Temperatura 0.
 
-**O limiar, declarado antes de medir** (na rubrica, commit `0169175`, antes de qualquer saída ser julgada ou rotulada): adotar só com **concordância ≥ 85%** (17 de 20) **e no máximo 1 falso positivo** (o juiz dizendo "adequada" quando o humano diz que não). O falso positivo é o erro que importa: é o crouton passando como almoço.
+**O limiar, declarado antes de medir** (na rubrica, commitada junto com a v1.0.0 do sistema, antes de qualquer saída ser julgada ou rotulada): adotar só com **concordância ≥ 85%** (17 de 20) **e no máximo 1 falso positivo** (o juiz dizendo "adequada" quando o humano diz que não). O falso positivo é o erro que importa: é o crouton passando como almoço.
 
 **A validação: concordância 80%, abaixo do limiar de 85%. O juiz NÃO foi adotado.**
 
@@ -134,12 +134,12 @@ A suíte roda **o sistema entregue, pelo ponto de entrada do README**: cada pass
 
 ### 4.1 As rodadas
 
-| Rodada | Versão | Commit | Quando | Pasta (a evidência) |
-|---|---|---|---|---|
-| **A** (antes) | 1.0.0 | `0169175` | 23/11/2026, 14:54–15:23 | [evals/resultados/v1.0.0_20261123-1454/](../evals/resultados/v1.0.0_20261123-1454/) |
-| **B** (depois) | 1.1.0 | `690d960` | 23/11/2026, 15:23–15:47 | [evals/resultados/v1.1.0_20261123-1523/](../evals/resultados/v1.1.0_20261123-1523/) |
+| Rodada | Versão | Quando | Pasta (a evidência) |
+|---|---|---|---|
+| **A** (antes) | 1.0.0 | 23/11/2026, 14:54–15:23 | [evals/resultados/v1.0.0_20261123-1454/](../evals/resultados/v1.0.0_20261123-1454/) |
+| **B** (depois) | 1.1.0 | 23/11/2026, 15:23–15:47 | [evals/resultados/v1.1.0_20261123-1523/](../evals/resultados/v1.1.0_20261123-1523/) |
 
-Cada pasta tem `rodada.json` (versões, commit, modelos, ambiente e placar), `casos.jsonl` (cada verificação de cada caso, com o detalhe, a saída e o comando de cada passo) e `traces/` (o trace de cada passo). A rodada A rodou a partir de um *git worktree* fixado no commit `0169175`, para que o código da v1.1.0, que estava sendo escrito ao mesmo tempo, não entrasse nela; os artefatos foram copiados para a pasta principal depois (por isso o atributo `nutri.log_detalhe` dos traces de A aponta para `.wt-v100/logs/`, e os logs estão em [logs/](../logs/)).
+Cada pasta tem `rodada.json` (versões, commit, modelos, ambiente e placar), `casos.jsonl` (cada verificação de cada caso, com o detalhe, a saída e o comando de cada passo) e `traces/` (o trace de cada passo). A rodada A rodou a partir de um *git worktree* fixado no commit da v1.0.0, para que o código da v1.1.0, que estava sendo escrito ao mesmo tempo, não entrasse nela; os artefatos foram copiados para a pasta principal depois (por isso o atributo `nutri.log_detalhe` dos traces de A aponta para `.wt-v100/logs/`, e os logs estão em [logs/](../logs/)).
 
 **O ambiente, igual nas duas rodadas** (gravado em `rodada.json`): GTX 1650 de 4 GB, Ryzen 5 5600H, WSL com 10 GB; Ollama 0.40.6; `nutri-qwen` digest `90eb002e84db`; `EMBED_MODELO=bge-m3-cpu` (os pesos do `bge-m3`, presos na CPU: [mudancas.md](mudancas.md)); `TIMEOUT_EXECUCAO_S=600` em vez dos 120 s do sistema, porque nesta máquina o modelo divide a GPU com a CPU; Python 3.12.3 (o README pede 3.13; as dependências fixadas instalam nas duas). O efeito do teto maior está medido em [observabilidade.md §8](observabilidade.md#8-o-slo-medido).
 
@@ -171,7 +171,7 @@ términos:  A concluido=18, recusa_sem_base=6, recusa_fora_escopo=5, sem_acao=3,
            B concluido=16, recusa_fora_escopo=7, recusa_sem_base=6, sem_acao=2, rejeitado_pelo_humano=2, pergunta_ao_usuario=1, acesso_negado=1
 ```
 
-A "MÉDIA" é a média das cinco classes (cada classe pesa igual, para uma classe grande não esconder uma pequena). Por caso: **A passou 28 de 35, B passou 33 de 35**. Nenhum caso regrediu.
+Os hashes impressos são os gravados em cada `rodada.json` na hora da rodada; as mensagens dos commits foram reescritas depois, e a correspondência com os hashes atuais está em [mudancas.md](mudancas.md). A "MÉDIA" é a média das cinco classes (cada classe pesa igual, para uma classe grande não esconder uma pequena). Por caso: **A passou 28 de 35, B passou 33 de 35**. Nenhum caso regrediu.
 
 ### 4.3 O que a comparação mostrou, caso a caso
 

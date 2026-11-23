@@ -19,10 +19,10 @@ O plano (§1 a §4) foi escrito **antes** da instrumentação e é ele que decid
 
 ## 2. O *trace* de uma execução
 
-**A árvore de uma recomendação típica**, copiada de um trace real da v1.1.0: o caso R01 da rodada B, "oi! o que eu posso fazer pra jantar hoje?" ([o arquivo](../logs/traces/20261123-152355_eval_20261123-1523_R01_1.jsonl); `python -m src.traces eval_20261123-1523_R01_1`, com os argumentos cortados aqui):
+**A árvore de uma recomendação típica**, copiada de um trace real da v1.1.0: o caso R01 da rodada B, "oi! o que eu posso fazer pra jantar hoje?" ([o arquivo](../logs/traces/20261123-152355_eval_20261123-1523_R01_1.jsonl); `python -m src.traces eval_20261123-1523_R01_1`, com os argumentos e o commit cortados aqui):
 
 ```text
-trace 0x632827393408d04ea22fa48e2ef2d2b3  ·  2026-11-23T18:23:55  ·  versão 1.1.0  ·  commit 690d960
+trace 0x632827393408d04ea22fa48e2ef2d2b3  ·  2026-11-23T18:23:55  ·  versão 1.1.0
 invoke_agent agente-nutricionista  72.4s  termino=concluido  rota=recomendar
   ├─ chat nutri-qwen                 9.22s  etapa=triagem            input_tokens=790   output_tokens=48
   ├─ chat nutri-qwen                 9.52s  etapa=chef               input_tokens=1230  output_tokens=25   pediu_ferramentas=['buscar_receitas']

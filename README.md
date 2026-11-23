@@ -10,11 +10,13 @@
 
 **Entrega atual:** Parte 3 — o sistema sob controle: [avaliação](docs/evals.md), [governança](docs/model-card.md), [segurança](docs/seguranca.md), [observabilidade](docs/observabilidade.md) e o [histórico de mudanças](docs/mudancas.md). Sistema na versão **1.1.0**. A documentação das Partes 1 e 2 continua em [docs/](docs/); comece por [docs/case.md](docs/case.md) e [docs/arquitetura.md](docs/arquitetura.md).
 
+**Frentes opcionais da Parte 3 (§5): nenhuma.** O sistema não usa MCP, não lê nem produz mídia, e não é multiagente: os papéis do modelo (triagem, chef, avaliador, consultor, verificador) são etapas de um mesmo grafo, no mesmo processo, sem credencial própria ([docs/seguranca.md §1](docs/seguranca.md#1-os-canais-por-onde-entra-conteúdo-não-confiável)).
+
 ---
 
 ## Como rodar
 
-Testado do zero, num clone novo, em **2 min 15 s** com os modelos já baixados (instalação 56 s, preparação 63 s, primeira pergunta 16 s). Baixar os modelos (~6 GB) leva mais, e depende da conexão.
+Testado do zero, num clone novo, **duas vezes**. Na Parte 2 (GPU de 8 GB): **2 min 15 s** com os modelos já baixados (instalação 56 s, preparação 63 s, primeira pergunta 16 s). Na Parte 3, v1.1.0, em 23/11/2026 (GTX 1650 de 4 GB): instalação 21 s (com o cache do pip), preparação **247 s** (quase tudo é baixar de novo a TBCA, que **bateu com o manifesto** de integridade), 130 testes passando e a primeira pergunta respondida em 101 s, com o modelo frio. Baixar os modelos (~6 GB) leva mais, e depende da conexão.
 
 **Requisitos:** Python 3.13, [Ollama](https://ollama.com) 0.40+ e GPU com 8 GB (roda na CPU, mas devagar).
 
@@ -101,7 +103,7 @@ Sugestão: Stir-Fried Black Rice with Fried Egg and Roasted Broccoli. Usa arroz,
 
 > **Sobre os hashes nos logs:** os logs da Parte 2 em `logs/` e as evidências em `docs/evidencias/` registram o commit `d16e6b7`. Esse é o mesmo código do commit `fffe38f` (a árvore é idêntica): só a mensagem do commit foi reescrita antes do envio.
 
-**A mesma pergunta na versão 1.1.0**, copiada da rodada B da suíte (caso R01, 23/11/2026, commit `690d960`; [o trace](logs/traces/20261123-152355_eval_20261123-1523_R01_1.jsonl), e a saída completa em [evals/resultados/v1.1.0_20261123-1523/casos.jsonl](evals/resultados/v1.1.0_20261123-1523/casos.jsonl)). Com o histórico vazio da rodada, o chef escolheu outra receita; e a justificativa do modelo prometia "manutenção do peso", então o código a trocou e declarou a troca:
+**A mesma pergunta na versão 1.1.0**, copiada da rodada B da suíte (caso R01, 23/11/2026; [o trace](logs/traces/20261123-152355_eval_20261123-1523_R01_1.jsonl), e a saída completa em [evals/resultados/v1.1.0_20261123-1523/casos.jsonl](evals/resultados/v1.1.0_20261123-1523/casos.jsonl)). Com o histórico vazio da rodada, o chef escolheu outra receita; e a justificativa do modelo prometia "manutenção do peso", então o código a trocou e declarou a troca:
 
 ```text
 $ export NUTRI_TOKEN=$(python -m src.acesso token ana)

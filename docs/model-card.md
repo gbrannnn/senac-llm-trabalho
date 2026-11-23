@@ -1,6 +1,6 @@
 # Model card — Agente Nutricionista Pessoal
 
-**Versão do documento:** 2.0.0 · **Data:** 23/11/2026 · **Sistema descrito:** v1.1.0, commit `690d960` · **Parte 3, §2**
+**Versão do documento:** 2.0.0 · **Data:** 23/11/2026 · **Sistema descrito:** v1.1.0 · **Parte 3, §2**
 
 > **Como ler.** Os doze campos da [nota sobre provar a decisão](https://github.com/celsocrivelaro/senac-agentes-llm/blob/main/aula-12-governanca/notas-de-aula/02-provar-a-decisao.md) (§4). Cada campo traz a **afirmação**. Em quatro deles (**Autoridade**, **Avaliação**, **Riscos aceitos**, **Registro e retenção**), cada afirmação vem com a **evidência**: arquivo e linha, teste, trace ou saída de comando. Quando não há evidência, a afirmação traz **LACUNA (Lnn)**, e a seção final [Lacunas](#lacunas) reúne todas, com a correção proposta.
 >
@@ -13,7 +13,7 @@
 | Afirmação | |
 |---|---|
 | Nome: **Agente Nutricionista Pessoal** | [README](../README.md) |
-| Versão do sistema: **1.1.0** (`VERSAO_SISTEMA`, [src/config.py:16](../src/config.py#L16)), commit `690d960`. A versão vai em todo trace (`nutri.versao_sistema`) e em toda rodada da suíte | [mudancas.md](mudancas.md) |
+| Versão do sistema: **1.1.0** (`VERSAO_SISTEMA`, [src/config.py:16](../src/config.py#L16)). A versão vai em todo trace (`nutri.versao_sistema`) e em toda rodada da suíte | [mudancas.md](mudancas.md) |
 | Data: 23/11/2026 | |
 | Equipe: Daniel de Araujo Carvalho, Eduardo Dias Santos, Gabriel Brandão Vehchani de Freitas, Pedro Henrique Gomes | [grupo.md](grupo.md) |
 | **Quem responde, por papel** (confirmado pelo grupo em 23/11/2026): **produto**, Gabriel Brandão Vehchani de Freitas (decide a finalidade e a retomada depois de uma suspensão); **desenvolvimento**, Daniel de Araujo Carvalho (código, suíte e versões); **operação**, Eduardo Dias Santos (roda o sistema, lê os traces, **suspende o agente**, guarda a credencial de operador); **risco**, Pedro Henrique Gomes (aceita os riscos do §9 e aprova as regras procedurais, como já fez com R1 e R2) | confirmação do grupo, 23/11/2026; fecha a L01 |
@@ -120,7 +120,7 @@ O formato é o do auditor de despesas da [nota sobre governar a ação](https://
 
 ## 9. Riscos aceitos
 
-Cada risco com a razão, o que o limita e o evento de reavaliação está em [seguranca.md §4](seguranca.md#4-os-riscos-aceitos). O aceite é do responsável de risco, Pedro Henrique Gomes (§1). Ele ainda não registrou o aceite formal dos riscos abaixo: **LACUNA (L34)**.
+Cada risco com a razão, o que o limita e o evento de reavaliação está em [seguranca.md §4](seguranca.md#4-os-riscos-aceitos) (R-A1 a R-A4). O aceite é do responsável de risco, Pedro Henrique Gomes (§1). Ele ainda não registrou o aceite formal dos riscos abaixo: **LACUNA (L34)**.
 
 | ID | Risco | O que o limita hoje | Evidência |
 |---|---|---|---|
@@ -156,7 +156,7 @@ A decisão escolhida é uma **escrita no estoque**, a única ação do sistema q
 [`20261123-151535_..._E01_1.jsonl`](../logs/traces/20261123-151535_eval_20261123-1454_E01_1.jsonl) e [`20261123-151550_..._E01_2.jsonl`](../logs/traces/20261123-151550_eval_20261123-1454_E01_2.jsonl). Os dois têm o mesmo `gen_ai.conversation.id = ana:eval-20261123-1454-E01` e o mesmo `nutri.execucao_id = f970619d92`: são a mesma execução, parada e retomada.
 
 1. **A entrada.** O primeiro trace começa com `nutri.entrada = "comprei leite e 6 ovos"`, `nutri.usuario_id = ana`.
-2. **Sob qual versão.** `nutri.versao_sistema = 1.0.0`, `nutri.commit = 0169175`; modelo `nutri-qwen`, digest `90eb002e84db` (`nutri.modelo`); prompts `triagem=1.1.0@0becc542dd`, `extrair_itens=1.0.0@618be9f5b4`, `pausa_estoque=1.0.0@0810a0c15d` (`nutri.prompts`).
+2. **Sob qual versão.** `nutri.versao_sistema = 1.0.0`; modelo `nutri-qwen`, digest `90eb002e84db` (`nutri.modelo`); prompts `triagem=1.1.0@0becc542dd`, `extrair_itens=1.0.0@618be9f5b4`, `pausa_estoque=1.0.0@0810a0c15d` (`nutri.prompts`).
 3. **O que o modelo decidiu.** Dois spans `chat`: na etapa `triagem`, a rota `estoque` (`nutri.triagem`: "a pessoa informou que comprou leite e 6 ovos"); na etapa `extrair_itens`, os itens. Não houve recuperação (`nutri.contexto.recuperado = []`): o estoque não usa o RAG.
 4. **O que o código decidiu, e por quê.** A pausa (`nutri.pausa.itens`) propôs gravar **só `ovo: 6 un`**. O leite não está na proposta: a saída mostrada à pessoa (`nutri.saida.resultado`) diz "leite: ambíguo entre leite_desnatado, leite_integral — NÃO será gravado, a menos que você edite". Quem casou "leite" com o catálogo foi o código, e ele não escolheu variante. O primeiro trace termina em `nutri.termino = aguardando_humano`, com prazo `nutri.pausa.expira_em = 2026-11-24T15:15:49`. **Nenhum span de escrita** existe nesse trace: nada foi gravado na pausa.
 5. **Quem aprovou, quando e o quê.** O segundo trace, 15 s depois, é a retomada: `nutri.aprovacao.quem = ana`, `nutri.aprovacao.quando = 2026-11-23T15:15:50`, `nutri.aprovacao.acao = editar`, `nutri.aprovacao.o_que = [leite integral 1 l, ovo 6 un]`. Foi a pessoa quem escolheu "leite integral" e acrescentou o leite à lista: `nutri.retomada` guarda a lista exata que ela mandou.
@@ -174,14 +174,14 @@ A decisão escolhida é uma **escrita no estoque**, a única ação do sistema q
 
 O histórico completo, com o que mudou, por quê e o commit, está em [mudancas.md](mudancas.md).
 
-| Versão | Commit | Data | O que mudou | Aprovou |
-|---|---|---|---|---|
-| desenho (v1) | `d2eb10a` | 09/10/2026 | arquitetura, base de conhecimento, memória e plano de avaliação, sem código | — |
-| Parte 2 | `fffe38f` | 20/10/2026 | o agente em LangGraph, com RAG, memória e pausa para aprovação | — |
-| 1.0.0 | `0169175` | 23/11/2026 | traces OpenTelemetry e a suíte, sem mudar o comportamento | — |
-| 1.1.0 | `690d960` | 23/11/2026 | os controles C1–C6 e três correções achadas pela suíte | — |
+| Versão | Data | O que mudou | Aprovou |
+|---|---|---|---|
+| desenho (v1) | 09/10/2026 | arquitetura, base de conhecimento, memória e plano de avaliação, sem código | — |
+| Parte 2 | 20/10/2026 | o agente em LangGraph, com RAG, memória e pausa para aprovação | — |
+| 1.0.0 | 23/11/2026 | traces OpenTelemetry e a suíte, sem mudar o comportamento | — |
+| 1.1.0 | 23/11/2026 | os controles C1–C6 e três correções achadas pela suíte | — |
 
-Ninguém aprova as mudanças: os commits vão direto para `main`, sem revisão → **LACUNA (L35)**.
+O commit de cada versão está em [mudancas.md](mudancas.md). Ninguém aprova as mudanças: os commits vão direto para `main`, sem revisão → **LACUNA (L35)**.
 
 ---
 
